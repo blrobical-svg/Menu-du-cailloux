@@ -1,0 +1,79 @@
+MISSION
+Tu dois relever sur le site officiel prix.nc (Nouvelle-Caledonie) le prix le plus bas a Noumea de 44 ingredients, puis me rendre un fichier JSON. N'utilise aucune autre source que prix.nc. N'invente jamais un prix : si tu ne trouves pas un ingredient, ne le mets pas dans le JSON.
+
+OUTIL A UTILISER
+Tu as besoin d'un vrai navigateur ou d'un outil capable d'ouvrir librement des adresses web. L'API publique de prix.nc repond en JSON quand on ouvre cette adresse (remplace TERME) :
+https://prix.nc/api/v1/produitsprix/search?nom=TERME&communeIds=1&page=0&size=50
+- communeIds=1 correspond a Noumea. Ne le change pas.
+- page=0 donne les 50 premiers resultats. Si la page renvoie 50 produits, ouvre aussi page=1, puis page=2 (3 pages au maximum par terme).
+- Fais une petite pause d'environ une demi-seconde entre deux adresses, pour ne pas surcharger le service.
+- Si le service refuse (erreur 403, 429 ou 5xx) ou si tu ne peux pas ouvrir ces adresses, ARRETE-TOI et dis-le moi clairement. Ne remplace pas par des prix trouves ailleurs ou estimes.
+
+LECTURE DE LA REPONSE
+Les produits sont dans _embedded > produitsprix. Pour chaque produit, utilise :
+- nom et variete : pour savoir de quel produit il s'agit
+- meilleurPrixParUnite : le prix (en francs CFP) a retenir
+- uniteLabelCourt : l'unite de ce prix ("kg", "l" ou "u" pour une piece)
+
+METHODE POUR CHAQUE INGREDIENT
+1. Cherche chaque terme indique. Regroupe les produits trouves (sans doublon).
+2. Ne garde un produit que si son nom (ou sa variete) contient les mots demandes ET aucun des mots a ecarter. Ignore les accents et les majuscules.
+3. Verifie l'unite : ingredient au kg = produit en "kg" ; au litre = produit en "l" ; a la piece = produit en "u".
+   Exception : quand une contenance est indiquee pour une piece, un produit vendu au kg ou au litre est accepte et son prix est multiplie par cette contenance.
+4. Parmi les produits gardes, prends les 3 dont meilleurPrixParUnite est le plus bas. Le prix de l'ingredient est la valeur du milieu de ces 3 (mediane), arrondie au franc. S'il y en a moins de 3, prends la mediane de ceux que tu as.
+5. S'il ne reste aucun produit, l'ingredient n'a pas de prix.
+
+LES 44 INGREDIENTS
+Format : identifiant | termes a chercher | unite du prix | mots a garder | mots a ecarter
+- oignon | chercher : oignon | prix par : kg | garder si le nom contient : oignon | ecarter si : frit, surgel, poudre, bocal, conserve, vinaigre, aigre, chips, rondelle, echalote.
+- ail | chercher : ail | prix par : kg | garder si le nom contient : ail | ecarter si : poudre, semoule, sauce, pain, beurre, fromage, granule, aioli, assaison, epice, melange, pate, creme.
+- carotte | chercher : carotte | prix par : kg | garder si le nom contient : carotte | ecarter si : rape, jus, bocal, conserve, surgel, petit(s) pois, boite, soupe, salade, pate.
+- pdt | chercher : pomme de terre | prix par : kg | garder si le nom contient : pomme(s) de terre | ecarter si : chips, puree, frite, surgel, flocon, gratin, roti, salade, boite, conserve, croquette, rosti.
+- tomate | chercher : tomate | prix par : kg | garder si le nom contient : tomate | ecarter si : concass, coulis, sauce, concentre, seche, pelee, ketchup, boite, conserve, bocal, puree, pulpe, jus, surgel, soupe, pizza, sandwich, farci, pate.
+- courgette | chercher : courgette | prix par : kg | garder si le nom contient : courgette | ecarter si : surgel, conserve, bocal, boite, gratin, poele, soupe, puree, pate.
+- chou | chercher : chou | prix par : kg | garder si le nom contient : chou | ecarter si : fleur, bruxelles, kimchi, choucroute, conserve, bocal, rave, salade.
+- poivron | chercher : poivron | prix par : kg | garder si le nom contient : poivron | ecarter si : conserve, bocal, boite, surgel, poudre, farci, pate, sauce.
+- concombre | chercher : concombre | prix par : kg | garder si le nom contient : concombre | ecarter si : cornichon, bocal, conserve, salade, sauce, creme, soin, masque.
+- salade | chercher : laitue, salade | prix par : piece | garder si le nom contient : laitue, batavia, romaine, feuille de chene ou salade verte | ecarter si : sachet, sauce, assaison, vinaigrette, pate, riz, thon, poulet, composee, piemontaise, fruits, bol, boite, conserve, melange, mesclun, cesar, lardon, jambon, tomate. Unite attendue : produit vendu a la piece (u).
+- avocat | chercher : avocat | prix par : piece | garder si le nom contient : avocat | ecarter si : huile, sauce, guacamole, creme, shampo, soin, masque, beurre, dip, puree. Unite attendue : produit vendu a la piece (u). Si le produit est au kg, multiplier son prix par 0.25.
+- citron | chercher : citron vert, lime | prix par : kg | garder si le nom contient : citron vert ou lime | ecarter si : jus, sirop, the, boisson, bonbon, huile, nettoy, bouteille, soda, biere, liqueur, vinaigre, glace, sorbet.
+- gingembre | chercher : gingembre | prix par : kg | garder si le nom contient : gingembre | ecarter si : poudre, moulu, the, tisane, confit, biscuit, biere, sirop, jus, pain d, bonbon, capsule, infusion, shot, huile, pate.
+- champi | chercher : champignon | prix par : kg | garder si le nom contient : champignon | ecarter si : conserve, boite, bocal, surgel, seche, sauce, soupe, creme, pizza, poelee, lamelle, pate, farce.
+- igname | chercher : igname | prix par : kg | garder si le nom contient : igname | ecarter si : chips, farine, frite, surgel.
+- manioc | chercher : manioc | prix par : kg | garder si le nom contient : manioc | ecarter si : farine, chips, tapioca, frite, surgel, pate, gari, pain.
+- patate | chercher : patate douce | prix par : kg | garder si le nom contient : patate | ecarter si : chips, frite, surgel, puree, pate.
+- banane | chercher : banane | prix par : kg | garder si le nom contient : banane | ecarter si : chips, seche, biscuit, yaourt, jus, sirop, compote, cake, gateau, boisson, cereale, lait, glace, pate, farine, confiture.
+- poulet | chercher : poulet entier, poulet | prix par : kg | garder si le nom contient : poulet | ecarter si : nugget, cordon, pane, fume, cuisse, filet, aile, escalope, hache, saucisse, salade, sandwich, plat, boite, conserve, pilon, blanc, manchon, brochette, roti, kebab, jambon, pate, soupe, bouillon, chien, chat, croquette, sauce, tikka, curry, riz, nouille.
+- cuisse | chercher : cuisse de poulet, cuisse | prix par : kg | garder si le nom contient : cuisse | ecarter si : nugget, pane, fume, canard, dinde, lapin, grenouille, cordon, roti, sauce, jambon, pate, chien.
+- hache | chercher : hache, boeuf hache | prix par : kg | garder si le nom contient : hache | ecarter si : porc, poulet, dinde, boulette, conserve, surgel, nugget, burger, legume, soja, vegetal, tomate, sauce, lasagne, hachis, parmentier, plat, pate, oignon, herbes.
+- boeuf | chercher : boeuf | prix par : kg | garder si le nom contient : boeuf, bovin | ecarter si : hache, conserve, corned, bouillon, cube, saucisse, burger, nouille, plat, sauce, soupe, pate, fume, tacos, ravioli, chili, bourguignon, surgel, chien, chat, croquette, kebab, carpaccio, seche, grison, pizza, riz, sandwich, arome, epice, assaison, marinade.
+- saucisse | chercher : saucisse | prix par : kg | garder si le nom contient : saucisse | ecarter si : seche, cocktail, aperitif, strasbourg, lentille, conserve, boite, bocal, chien, chat, surgel, choucroute, hot dog, knacki, chorizo, pate, pizza, sandwich.
+- cerf | chercher : cerf | prix par : kg | garder si le nom contient : cerf | ecarter si : pate, saucisson, conserve, terrine, rillette, fume, seche, chien, nourriture, croquette, biscuit, bonbon.
+- poisson | chercher : thon, mahi, wahoo, marlin, poisson frais | prix par : kg | garder si le nom contient : thon, mahi, wahoo, marlin ou poisson | ecarter si : boite, conserve, surgel, pane, baton, fume, huile, sauce, sardine, maquereau, chat, chien, litiere, salade, rillette, pate, croquette, nugget, plat, riz, pizza, sandwich, tartinable, bouillon, soupe.
+- crevette | chercher : crevette | prix par : kg | garder si le nom contient : crevette | ecarter si : chips, cracker, nem, beignet, sauce, soupe, salade, plat, riz, nouille, bouillon, cocktail, conserve, boite, bocal, pate, sushi, rouleau, arome, pizza, croquette, chien, chat, epice, assaison.
+- jambon | chercher : jambon | prix par : kg | garder si le nom contient : jambon | ecarter si : cru, sec, pizza, sandwich, quiche, croque, salade, chien, puree, pate, mousse, beurre, fromage, feuillet, nouille, tartinable, plat, omelette, gratin, lardon.
+- oeuf | chercher : oeuf, oeufs frais | prix par : piece | garder si le nom contient : oeuf(s) | ecarter si : chocolat, paques, kinder, plat, mayonn, nouille, pate, poudre, lait, cocotte, dur, coque, colorant, gaufre, crepe, biscuit, tapioca, jaune, blanc, liquide, surprise, cadeau, jouet, decor, teinture, ballon, gel, shampo, creme, omelette, salade, sandwich, pain. Unite attendue : produit vendu a la piece (u).
+- creme | chercher : creme fraiche, creme | prix par : piece | garder si le nom contient : creme ET fraiche | ecarter si : soin, jour, nuit, main, visage, corps, solaire, glace, dessert, chocolat, vanille, patissiere, vegetal, soja, anti, depil, rasage, bebe, hydra, pommade, douche, chantilly. Unite attendue : produit vendu a la piece (u). Si le produit est au litre, multiplier son prix par 0.2.
+- fromage | chercher : fromage rape, rape | prix par : kg | garder si le nom contient : fromage / emmental / gruyere / mozzarella / cheddar ET rape | ecarter si : pizza, plat, carotte, coco, legume, sauce, chips, snack, sandwich, burger, salade, tartinable, cracker, epice, assaison.
+- riz | chercher : riz | prix par : kg | garder si le nom contient : riz | ecarter si : cuisine, saute, cantonais, pudding, lait, souffle, galette, gateau, vinaigre, farine, cracker, nouille, sauce, plat, salade, micro, express, the, boisson, dessert, huile, papier, cereale, barre, vermicelle, sushi, bouillie, creme, boite, conserve, chien, chat, croquette, pate, cake, snack, chips, semoule, bebe, infantile, onigiri, maki, tofu.
+- pates | chercher : spaghetti, pates | prix par : kg | garder si le nom contient : spaghetti, pates, coquillettes, penne, tagliatelles, fusilli ou macaroni | ecarter si : fraiche, brisee, feuilletee, sablee, levee, pizza, tartiner, amande, dentifrice, fruit, boite, conserve, chien, chat, sauce, plat, salade, cuisine, carbonara, bolognaise, lasagne, ravioli, tortellini, instantane, nouille, riz, cheveux, bebe, pate a, pate de.
+- lentille | chercher : lentille | prix par : kg | garder si le nom contient : lentille | ecarter si : boite, conserve, cuisine, saucisse, salade, soupe, plat, chips, pate, bocal, prepar, cuit, micro, sachet.
+- pois | chercher : pois chiche | prix par : piece | garder si le nom contient : pois chiche | ecarter si : houmous, hummus, salade, plat, falafel, farine, chips, creme, tartinable, snack, cuisine, puree. Unite attendue : produit vendu a la piece (u).
+- haricot | chercher : haricot rouge | prix par : piece | garder si le nom contient : haricot ET rouge (ou kidney) | ecarter si : salade, plat, chili, cuisine, sec, graine, prepar, boeuf, viande, sauce. Unite attendue : produit vendu a la piece (u).
+- tomconc | chercher : tomate concassee, tomate pelee | prix par : piece | garder si le nom contient : concasse(e) ou pele(e) | ecarter si : plat, sauce, pizza, coulis, pate, chips, tapenade, soupe. Unite attendue : produit vendu a la piece (u).
+- coco | chercher : lait de coco | prix par : piece | garder si le nom contient : lait de coco | ecarter si : eau, huile, rape, shampo, biscuit, glace, boisson, sirop, sucre, farine, chips, dessert, yaourt, savon, soin, poudre, curry, riz, soupe, cheveux. Unite attendue : produit vendu a la piece (u). Si le produit est au litre, multiplier son prix par 0.4.
+- mais | chercher : mais | prix par : piece | garder si le nom contient : mais doux | ecarter si : pop, chips, huile, farine, cereale, semoule, gateau, chien, tortilla, surgel, epi, frais, creme, salade, plat, soupe, riz. Unite attendue : produit vendu a la piece (u).
+- ptpois | chercher : petits pois | prix par : piece | garder si le nom contient : petit(s) pois | ecarter si : chiche, surgel, plat, soupe, puree, cuisine, salade, carotte, chips, snack, cassoulet, creme. Unite attendue : produit vendu a la piece (u).
+- concentre | chercher : concentre de tomate, concentre | prix par : piece | garder si le nom contient : concentre ET tomate | ecarter si : jus, sirop, fruit, cafe, lessive, bouillon, soupe, volaille, legume, boeuf, poisson, fond, fumet, arome. Unite attendue : produit vendu a la piece (u).
+- farine | chercher : farine | prix par : kg | garder si le nom contient : farine | ecarter si : coco, riz, manioc, sarrasin, mais, avoine, chataigne, lait, bebe, infantile, poisson, complete, chien, chat, croquette, pois, soja, epeautre, pate, gateau, preparation, cake, biscuit, pain, gaufre, crepe, pizza, melange, levure, gluten, amande, noisette, banane, patate, igname, taro, lupin, lin, seigle, orge, millet, quinoa, tapioca.
+- huile | chercher : huile | prix par : litre | garder si le nom contient : huile ET (tournesol, colza, vegetale, arachide ou friture) | ecarter si : olive, massage, moteur, bain, corps, visage, essentielle, sesame, coco, argan, noix, thon, sardine, vidange, lubrifi, cheveux, amande, ricin, bebe, solaire, soin, lotion, tondeuse, chaine, outil, bois, teck, barbecue, beurre, savon, cire, shampo, graisse, spray, aerosol, degrippant, nettoy.
+- soja | chercher : sauce soja | prix par : litre | garder si le nom contient : sauce ET soja | ecarter si : lait, boisson, yaourt, dessert, graine, pousse, steak, proteine, nouille, tofu, germe, creme, sucree, barbecue, nem, riz, plat.
+- curry | chercher : curry | prix par : piece | garder si le nom contient : curry | ecarter si : poulet, plat, riz, nouille, sauce, boite, soupe, pate, coco, lait, chips, cuisine, instantane, legume, pomme, creme, vindaloo, tikka, masala. Unite attendue : produit vendu a la piece (u).
+
+RESULTAT ATTENDU
+Donne d'abord un court controle, une ligne par ingredient : identifiant, prix retenu, et les 3 produits utilises avec leur prix. Signale tout ingredient sans produit ou tout prix qui te parait incoherent.
+Termine par UN SEUL bloc de code contenant uniquement ce JSON (sans commentaire ni texte dedans), avec la date du jour :
+
+{"source":"prix.nc","commune":"Noumea","date":"AAAA-MM-JJ","prices":{"oignon":0,"ail":0}}
+
+Dans "prices", mets un couple identifiant : prix (nombre entier en francs) pour chaque ingredient trouve, avec exactement les identifiants de la liste ci-dessus.
