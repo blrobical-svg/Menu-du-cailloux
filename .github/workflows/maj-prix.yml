@@ -2,15 +2,21 @@ name: Mise à jour des prix
 
 on:
   schedule:
-    - cron: '0 18 * * 0'
+    # tous les jours à 16h UTC = 3h du matin à Nouméa
+    - cron: '0 16 * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: maj-prix
+  cancel-in-progress: false
+
 jobs:
   maj:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -27,4 +33,4 @@ jobs:
           git config user.name "prix-bot"
           git config user.email "prix-bot@users.noreply.github.com"
           git add prix.json rapport.txt
-          git diff --cached --quiet || (git commit -m "Prix du $(date +%F)" && git push)
+          git diff --cached --quiet || (git commit -m "Prix du $(date +%F)" && git pull --rebase origin main && git push origin HEAD:main)
