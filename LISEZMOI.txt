@@ -1,0 +1,21 @@
+MENU CAILLOU - MISE À JOUR DES PRIX
+
+Ce petit outil relève sur prix.nc le prix le plus bas à Nouméa de chacun des 44 ingrédients de Menu Caillou.
+
+1. Décompresse ce dossier.
+2. Lance-le :
+   - Windows : double-clique sur Lancer-Windows.bat
+   - Mac     : double-clique sur Lancer-Mac.command (la première fois : clic droit > Ouvrir)
+   - Linux   : python3 maj_prix.py
+3. Attends 2 à 3 minutes. Une fenêtre noire affiche l'avancement.
+4. À la fin, le résultat est copié automatiquement.
+   Sur ton téléphone, ouvre Menu Caillou > onglet Prix > « Coller et appliquer ».
+   (Il faut d'abord envoyer le texte copié vers ton téléphone, par exemple par WhatsApp ou par mail à toi-même.)
+
+Si la copie automatique ne marche pas, ouvre le fichier prix-nc.json avec le Bloc-notes et copie tout son contenu.
+Le fichier rapport.txt liste les produits retenus pour chaque ingrédient : jette-y un œil pour repérer une erreur.
+
+Il faut Python 3 sur l'ordinateur (gratuit, python.org). Sous Windows, coche « Add python.exe to PATH » à l'installation.
+Windows peut afficher un avertissement à l'ouverture d'un fichier téléchargé : choisis « Exécuter quand même ».
+
+Les prix affichés sont les plus bas relevés à Nouméa : tes courses réelles peuvent coûter un peu plus.
