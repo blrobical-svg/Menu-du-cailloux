@@ -51,9 +51,10 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;}
 main{max-width:640px;margin:0 auto;padding:20px 16px 48px;}
 h1,h2{font-family:var(--display);margin:0;letter-spacing:-.01em;}
-h1{font-size:30px;font-weight:700;line-height:1.05;}
+h1{font-size:36px;font-weight:700;line-height:1.05;}
+header{text-align:center;}
 h2{font-size:20px;font-weight:700;}
-.sub{margin:6px 0 0;color:var(--muted);font-size:15px;}
+.sub{margin:8px auto 0;max-width:28ch;color:var(--muted);font-size:15px;}
 button{font:inherit;color:inherit;cursor:pointer;}
 :focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-radius:6px;}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
@@ -140,12 +141,6 @@ button{font:inherit;color:inherit;cursor:pointer;}
 .pin{display:flex;align-items:center;gap:6px;}
 .pin input{width:64px;height:38px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);text-align:right;font:inherit;font-variant-numeric:tabular-nums;padding:0 8px;}
 .pin span{font-size:12px;color:var(--muted);white-space:nowrap;}
-details.upd{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:12px;}
-details.upd summary{font-weight:600;cursor:pointer;min-height:28px;}
-details.upd ol{margin:10px 0 12px;padding-left:20px;font-size:14px;color:var(--muted);}
-details.upd li{margin-bottom:6px;}
-details.upd textarea{width:100%;min-height:96px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:12px ui-monospace,Menlo,monospace;padding:8px;margin:4px 0 10px;}
-details.upd .btns{display:flex;gap:8px;flex-wrap:wrap;}
 .info{font-size:14px;color:var(--muted);margin:0 0 12px;}
 .mat-wrap{margin:0 0 14px;}
 .mat-lbl{font-size:13px;color:var(--muted);margin:0 0 6px 2px;}
@@ -155,12 +150,24 @@ details.upd .btns{display:flex;gap:8px;flex-wrap:wrap;}
 .how{list-style:none;margin:2px 0 4px;padding:8px 0 4px;border-top:1px dashed var(--line);display:grid;gap:8px;font-size:14px;}
 .how b{font-weight:600;}
 .how-link{display:block;font-size:14px;padding:2px 0 8px;color:var(--teal);font-weight:600;}
-.rec-meta .mats{letter-spacing:2px;}
+.rec-meta .mats{white-space:nowrap;}
 .share{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:22px;}
 .share img{flex:0 0 auto;width:112px;height:112px;border-radius:8px;background:#fff;image-rendering:pixelated;}
 .share strong{font-family:var(--display);font-size:17px;color:var(--ink);}
 .share p{margin:4px 0 10px;font-size:14px;color:var(--muted);}
-.install{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;background:var(--pale);border-radius:14px;padding:10px 12px;margin-top:14px;font-size:14px;}
+.ad{position:fixed;left:0;right:0;z-index:20;max-width:640px;margin:0 auto;background:var(--surface);border:1px solid var(--line);padding:4px 10px 6px;font-size:13px;color:var(--muted);}
+.ad[hidden]{display:none;}
+.ad-haut{top:0;border-top:0;border-radius:0 0 14px 14px;padding-top:calc(4px + env(safe-area-inset-top,0px));}
+.ad-bas{bottom:0;border-bottom:0;border-radius:14px 14px 0 0;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));}
+.ad-lbl{display:block;font-size:11px;line-height:1.3;color:var(--muted);margin:0 0 3px 2px;}
+.ad-slot{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px 12px;min-height:40px;border:1px dashed var(--line);border-radius:10px;text-align:center;}
+.ad-slot a{color:var(--teal);font-weight:600;}
+.ad-card{display:block;min-height:40px;text-decoration:none;color:var(--ink);}
+.ad-card b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ad-card span{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+html.ad-on main{padding-top:calc(var(--ad-top-h,70px) + 14px);padding-bottom:calc(var(--ad-bot-h,70px) + 28px);}
+html.ad-on .toast{bottom:calc(var(--ad-bot-h,70px) + 14px);}
+.install{text-align:left;display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;background:var(--pale);border-radius:14px;padding:10px 12px;margin-top:14px;font-size:14px;}
 .install[hidden]{display:none;}
 .install span{flex:1 1 220px;}
 details.about{margin-top:6px;}
@@ -182,6 +189,7 @@ details.about a{color:var(--teal);}
 <div class="bg bg-jour" aria-hidden="true"></div>
 <div class="bg bg-nuit" aria-hidden="true"></div>
 <main>
+  <div class="ad ad-haut" id="ad-haut" role="complementary" aria-label="Publicité" hidden></div>
   <header>
     <h1>Menu Caillou</h1>
     <p class="sub">Tes dîners de la semaine, chiffrés en francs pacifique.</p>
@@ -260,17 +268,16 @@ details.about a{color:var(--teal);}
   </section>
 
   <footer class="note">
-    <p>Les prix de départ sont des estimations, à remplacer par les relevés officiels de prix.nc (onglet Prix). Après une mise à jour, chaque prix est le plus bas relevé à Nouméa : tes courses peuvent donc coûter un peu plus cher. Les plats sont chiffrés au prorata des quantités ; la liste de courses arrondit les boîtes et les pièces à l'unité. Un enfant compte pour 0,6 portion d'adulte.</p>
+    <p>Les prix viennent de prix.nc et se mettent à jour automatiquement. Chaque prix est le plus bas relevé à Nouméa : tes courses peuvent donc coûter un peu plus cher. Les plats sont chiffrés au prorata des quantités ; la liste de courses arrondit les boîtes et les pièces à l'unité. Un enfant compte pour 0,6 portion d'adulte.</p>
     <details class="about"><summary>À propos, sources et confidentialité</summary>
       <p>Les prix viennent du site officiel <a href="https://prix.nc" target="_blank" rel="noopener">prix.nc</a>, relevés à Nouméa et mis à jour régulièrement. Ils sont indicatifs : en magasin, un prix peut différer.</p>
       <p>Menu Caillou est un outil indépendant, sans lien avec prix.nc ni avec le gouvernement de la Nouvelle-Calédonie.</p>
-      <p>Aucune donnée personnelle n'est collectée ni envoyée : tes réglages (foyer, budget, menu) restent sur ton appareil.</p>
+      <p id="about-priv">Aucune donnée personnelle n'est collectée ni envoyée : tes réglages (foyer, budget, menu) restent sur ton appareil.</p>
     </details>
   </footer>
 </main>
+<div class="ad ad-bas" id="ad-bas" role="complementary" aria-label="Publicité" hidden></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-<script type="text/plain" id="ps-src">(async () => { if (!/prix\.nc$/.test(location.hostname)) { alert('Ouvre d abord le site prix.nc puis relance le script.'); return; } const COMMUNE = 1; const sleep = ms => new Promise(r => setTimeout(r, ms)); const norm = s => String(s || '').toLowerCase().replace(/œ/g, 'oe').normalize('NFD').replace(/[\u0300-\u036f]/g, ''); const R = { oignon:[['oignon'],'kg',/oignon/,/frit|surgel|poudre|bocal|conserve|vinaigre|aigre|chips|rondelle|echalote/], ail:[['ail'],'kg',/\bail\b/,/poudre|semoule|sauce|pain|beurre|fromage|granule|aioli|assaison|epice|melange|pate|creme/], carotte:[['carotte'],'kg',/carotte/,/rape|jus|bocal|conserve|surgel|petits? pois|boite|soupe|salade|pate/], pdt:[['pomme de terre'],'kg',/pommes? de terre/,/chips|puree|frite|surgel|flocon|gratin|roti|salade|boite|conserve|croquette|rosti/], tomate:[['tomate'],'kg',/tomate/,/concass|coulis|sauce|concentre|seche|pelee|ketchup|boite|conserve|bocal|puree|pulpe|jus|surgel|soupe|pizza|sandwich|farci|pate/], courgette:[['courgette'],'kg',/courgette/,/surgel|conserve|bocal|boite|gratin|poele|soupe|puree|pate/], chou:[['chou'],'kg',/\bchou\b/,/fleur|bruxelles|kimchi|choucroute|conserve|bocal|rave|salade/], poivron:[['poivron'],'kg',/poivron/,/conserve|bocal|boite|surgel|poudre|farci|pate|sauce/], concombre:[['concombre'],'kg',/concombre/,/cornichon|bocal|conserve|salade|sauce|creme|soin|masque/], salade:[['laitue','salade'],'pce',/laitue|batavia|romaine|feuille de chene|salade verte/,/sachet|sauce|assaison|vinaigrette|pate|riz|thon|poulet|composee|piemontaise|fruits|bol|boite|conserve|melange|mesclun|cesar|lardon|jambon|tomate/], avocat:[['avocat'],'pce',/avocat/,/huile|sauce|guacamole|creme|shampo|soin|masque|beurre|dip|puree/,0.25], citron:[['citron vert','lime'],'kg',/citron.? vert|\blimes?\b/,/jus|sirop|the |boisson|bonbon|huile|nettoy|bouteille|soda|biere|liqueur|vinaigre|glace|sorbet/], gingembre:[['gingembre'],'kg',/gingembre/,/poudre|moulu|the |tisane|confit|biscuit|biere|sirop|jus|pain d|bonbon|capsule|infusion|shot|huile|pate/], champi:[['champignon'],'kg',/champignon/,/conserve|boite|bocal|surgel|seche|sauce|soupe|creme|pizza|poelee|lamelle|pate|farce/], igname:[['igname'],'kg',/igname/,/chips|farine|frite|surgel/], manioc:[['manioc'],'kg',/manioc/,/farine|chips|tapioca|frite|surgel|pate|gari|pain/], patate:[['patate douce'],'kg',/patate/,/chips|frite|surgel|puree|pate/], banane:[['banane'],'kg',/banane/,/chips|seche|biscuit|yaourt|jus|sirop|compote|cake|gateau|boisson|cereale|lait|glace|pate|farine|confiture/], poulet:[['poulet entier','poulet'],'kg',/poulet/,/nugget|cordon|pane|fume|cuisse|filet|aile|escalope|hache|saucisse|salade|sandwich|plat|boite|conserve|pilon|blanc|manchon|brochette|roti|kebab|jambon|pate|soupe|bouillon|chien|chat|croquette|sauce|tikka|curry|riz|nouille/], cuisse:[['cuisse de poulet','cuisse'],'kg',/cuisse/,/nugget|pane|fume|canard|dinde|lapin|grenouille|cordon|roti|sauce|jambon|pate|chien/], hache:[['hache','boeuf hache'],'kg',/hache/,/porc|poulet|dinde|boulette|conserve|surgel|nugget|burger|legume|soja|vegetal|tomate|sauce|lasagne|hachis|parmentier|plat|pate|oignon|herbes/], boeuf:[['boeuf'],'kg',/boeuf|bovin/,/hache|conserve|corned|bouillon|cube|saucisse|burger|nouille|plat|sauce|soupe|pate|fume|tacos|ravioli|chili|bourguignon|surgel|chien|chat|croquette|kebab|carpaccio|seche|grison|pizza|riz|sandwich|arome|epice|assaison|marinade/], saucisse:[['saucisse'],'kg',/saucisse/,/seche|cocktail|aperitif|strasbourg|lentille|conserve|boite|bocal|chien|chat|surgel|choucroute|hot ?dog|knacki|chorizo|pate|pizza|sandwich/], cerf:[['cerf'],'kg',/cerf/,/pate|saucisson|conserve|terrine|rillette|fume|seche|chien|nourriture|croquette|biscuit|bonbon/], poisson:[['thon','mahi','wahoo','marlin','poisson frais'],'kg',/thon|mahi|wahoo|marlin|poisson/,/boite|conserve|surgel|pane|baton|fume|huile|sauce|sardine|maquereau|chat|chien|litiere|salade|rillette|pate|croquette|nugget|plat|riz|pizza|sandwich|tartinable|bouillon|soupe/], crevette:[['crevette'],'kg',/crevette/,/chips|cracker|nem|beignet|sauce|soupe|salade|plat|riz|nouille|bouillon|cocktail|conserve|boite|bocal|pate|sushi|rouleau|arome|pizza|croquette|chien|chat|epice|assaison/], jambon:[['jambon'],'kg',/jambon/,/cru|sec|pizza|sandwich|quiche|croque|salade|chien|puree|pate|mousse|beurre|fromage|feuillet|nouille|tartinable|plat|omelette|gratin|lardon/], oeuf:[['oeuf','oeufs frais'],'pce',/\boeufs?\b/,/chocolat|paques|kinder|plat|mayonn|nouille|pate|poudre|lait|cocotte|dur|coque|colorant|gaufre|crepe|biscuit|tapioca|jaune|blanc|liquide|surprise|cadeau|jouet|decor|teinture|ballon|gel|shampo|creme|omelette|salade|sandwich|pain/], creme:[['creme fraiche','creme'],'pce',/creme.*fraiche|fraiche.*creme/,/soin|jour|nuit|main|visage|corps|solaire|glace|dessert|chocolat|vanille|patissiere|vegetal|soja|anti|depil|rasage|bebe|hydra|pommade|douche|chantilly/,0.2], fromage:[['fromage rape','rape'],'kg',/(fromage|emmental|gruyere|mozzarella|cheddar).*rape|rape.*(fromage|emmental|gruyere|mozzarella|cheddar)/,/pizza|plat|carotte|coco|legume|sauce|chips|snack|sandwich|burger|salade|tartinable|cracker|epice|assaison/], riz:[['riz'],'kg',/\briz\b/,/cuisine|saute|cantonais|pudding|lait|souffle|galette|gateau|vinaigre|farine|cracker|nouille|sauce|plat|salade|micro|express|the |boisson|dessert|huile|papier|cereale|barre|vermicelle|sushi|bouillie|creme|boite|conserve|chien|chat|croquette|pate|cake|snack|chips|semoule|bebe|infantile|onigiri|maki|tofu/], pates:[['spaghetti','pates'],'kg',/spaghetti|pates|coquillette|penne|tagliatelle|fusilli|macaroni/,/fraiche|brisee|feuilletee|sablee|levee|pizza|tartiner|amande|dentifrice|fruit|boite|conserve|chien|chat|sauce|plat|salade|cuisine|carbonara|bolognaise|lasagne|ravioli|tortellini|instantane|nouille|riz|cheveux|bebe|pate a|pate de/], lentille:[['lentille'],'kg',/lentille/,/boite|conserve|cuisine|saucisse|salade|soupe|plat|chips|pate|bocal|prepar|cuit|micro|sachet/], pois:[['pois chiche'],'pce',/pois chiche/,/houmous|hummus|salade|plat|falafel|farine|chips|creme|tartinable|snack|cuisine|puree/], haricot:[['haricot rouge'],'pce',/haricot.*rouge|rouge.*haricot|kidney/,/salade|plat|chili|cuisine|sec|graine|prepar|boeuf|viande|sauce/], tomconc:[['tomate concassee','tomate pelee'],'pce',/concass|pelee/,/plat|sauce|pizza|coulis|pate|chips|tapenade|soupe/], coco:[['lait de coco'],'pce',/lait de coco|lait coco/,/eau|huile|rape|shampo|biscuit|glace|boisson|sirop|sucre|farine|chips|dessert|yaourt|savon|soin|poudre|curry|riz|soupe|cheveux/,0.4], mais:[['mais'],'pce',/mais doux/,/pop|chips|huile|farine|cereale|semoule|gateau|chien|tortilla|surgel|epi|frais|creme|salade|plat|soupe|riz/], ptpois:[['petits pois'],'pce',/petits? pois/,/chiche|surgel|plat|soupe|puree|cuisine|salade|carotte|chips|snack|cassoulet|creme/], concentre:[['concentre de tomate','concentre'],'pce',/concentre.*tomate|tomate.*concentre/,/jus|sirop|fruit|cafe|lessive|bouillon|soupe|volaille|legume|boeuf|poisson|fond|fumet|arome/], farine:[['farine'],'kg',/farine/,/coco|riz|manioc|sarrasin|mais|avoine|chataigne|lait|bebe|infantile|poisson|complete|chien|chat|croquette|pois|soja|epeautre|pate|gateau|preparation|cake|biscuit|pain|gaufre|crepe|pizza|melange|levure|gluten|amande|noisette|banane|patate|igname|taro|lupin|lin|seigle|orge|millet|quinoa|tapioca/], huile:[['huile'],'L',/huile.*(tournesol|colza|vegetale|arachide|friture)|(tournesol|colza|vegetale|arachide).*huile/,/olive|massage|moteur|bain|corps|visage|essentielle|sesame|coco|argan|noix|thon|sardine|vidange|lubrifi|cheveux|amande|ricin|bebe|solaire|soin|lotion|tondeuse|chaine|outil|bois|teck|barbecue|beurre|savon|cire|shampo|graisse|spray|aerosol|degrippant|nettoy/], soja:[['sauce soja'],'L',/sauce.*soja|soja.*sauce/,/lait|boisson|yaourt|dessert|graine|pousse|steak|proteine|nouille|tofu|germe|creme|sucree|barbecue|nem|riz|plat/], curry:[['curry'],'pce',/curry/,/poulet|plat|riz|nouille|sauce|boite|soupe|pate|coco|lait|chips|cuisine|instantane|legume|pomme|creme|vindaloo|tikka|masala/] }; const box = document.createElement('div'); box.style.cssText = 'position:fixed;z-index:2147483647;top:0;left:0;right:0;bottom:0;overflow:auto;background:white;color:black;padding:16px;font:16px system-ui,sans-serif'; const title = document.createElement('div'); title.style.cssText = 'font-weight:700;font-size:20px;margin-bottom:8px'; title.textContent = 'Menu Caillou : prix.nc'; const st = document.createElement('div'); st.textContent = 'Demarrage...'; box.appendChild(title); box.appendChild(st); document.body.appendChild(box); async function search(term, page) { const url = location.origin + '/api/v1/produitsprix/search?nom=' + encodeURIComponent(term) + '&communeIds=' + COMMUNE + '&page=' + page + '&size=50'; const r = await fetch(url, {headers: {Accept: 'application/json'}}); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json(); return (j._embedded && j._embedded.produitsprix) || []; } const kindOf = p => { const u = norm(p.uniteLabelCourt || p.uniteLabel || ''); if (u === 'kg') return 'kg'; if (u === 'l') return 'L'; return ['g', 'ml', 'cl', '100g', '100ml', 'm', 'cm'].includes(u) ? '?' : 'u'; }; const median = arr => (arr.length & 1) ? arr[(arr.length - 1) / 2] : (arr[arr.length / 2 - 1] + arr[arr.length / 2]) / 2; const prices = {}, report = [], ids = Object.keys(R); let i = 0; for (const id of ids) { const [terms, unit, must, no, pack] = R[id]; i++; st.textContent = 'Recherche ' + i + ' sur ' + ids.length + ' : ' + id + ' (ne ferme pas cette page, environ 2 minutes)'; try { const seen = new Map(); for (const t of terms) { for (let page = 0; page < 3; page++) { const items = await search(t, page); items.forEach(p => seen.set(p.idProduit || p.id, p)); await sleep(350); if (items.length < 50) break; } } const cands = []; for (const p of seen.values()) { const n = norm(p.nom + ' ' + (p.variete || '')); if (!must.test(n) || no.test(n)) continue; const price = Number(p.meilleurPrixParUnite); if (!(price > 0)) continue; const kind = kindOf(p); let v = null; if (unit === 'kg' && kind === 'kg') v = price; else if (unit === 'L' && kind === 'L') v = price; else if (unit === 'pce') { if (kind === 'u') v = price; else if (pack && kind !== '?') v = price * pack; } if (v > 0) cands.push({v, nom: p.nom}); } cands.sort((a, b) => a.v - b.v); const low = cands.slice(0, 3); if (!low.length) { report.push(id + ' : aucun produit trouve'); continue; } const val = Math.round(median(low.map(c => c.v))); prices[id] = val; report.push(id + ' : ' + val + ' F  (' + low.map(c => c.nom + ' ' + Math.round(c.v)).join(' | ') + ')'); } catch (e) { report.push(id + ' : erreur ' + e.message); if (/HTTP 4(29|03)|HTTP 5/.test(e.message)) break; } } const result = {source: 'prix.nc', commune: 'Noumea', date: new Date().toISOString().slice(0, 10), prices}; const json = JSON.stringify(result); box.textContent = ''; const head = document.createElement('div'); head.style.cssText = 'font-weight:700;font-size:18px;margin-bottom:8px'; head.textContent = Object.keys(prices).length + ' prix trouves sur ' + ids.length + '. Appuie sur Copier, puis retourne dans Menu Caillou.'; const ta = document.createElement('textarea'); ta.value = json; ta.readOnly = true; ta.style.cssText = 'width:90vw;height:90px;font:12px monospace;box-sizing:border-box'; const btn = document.createElement('button'); btn.textContent = 'Copier le resultat'; btn.style.cssText = 'font:700 17px system-ui;padding:12px 16px;margin:10px 8px 10px 0;border:0;border-radius:10px;background:teal;color:white'; btn.onclick = () => { ta.select(); const ok = () => { btn.textContent = 'Copie'; }; const ko = () => { try { document.execCommand('copy'); ok(); } catch (e) { btn.textContent = 'Appui long sur le texte pour copier'; } }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(json).then(ok, ko); else ko(); }; const close = document.createElement('button'); close.textContent = 'Fermer'; close.style.cssText = 'font:16px system-ui;padding:12px 16px;border:1px solid gray;border-radius:10px;background:white;color:black'; close.onclick = () => box.remove(); const pre = document.createElement('pre'); pre.style.cssText = 'white-space:pre-wrap;font:12px monospace;margin-top:12px'; pre.textContent = report.join(String.fromCharCode(10)); box.appendChild(head); box.appendChild(ta); box.appendChild(btn); box.appendChild(close); box.appendChild(pre); })();</script>
 
 <script>
 /* ---------- Données ---------- */
@@ -620,21 +627,7 @@ function renderPrices(){
   let html = `<div class="head"><h2>Prix de référence</h2><button type="button" class="btn" data-act="reset-prices">Annuler mes modifications</button></div>`;
   html += S.priceInfo
     ? `<p class="info">Prix prix.nc du ${fmtDate(S.priceInfo.date) || 'jour inconnu'} : ${S.priceInfo.n} ingrédients, au plus bas relevé à Nouméa. Les autres restent des estimations. Tes modifications à la main passent avant.</p>`
-    : `<p class="info">Prix de départ : des estimations. Tes modifications à la main sont marquées « modifié ».</p>`;
-  html += `<details class="upd"><summary>Mettre à jour depuis prix.nc</summary>
-    <ol>
-      <li>Ouvre <strong>prix.nc</strong> dans Chrome, dans un onglet à part.</li>
-      <li>Reviens ici et touche « Copier le script ».</li>
-      <li>Retourne sur prix.nc, touche la barre d'adresse, tape <strong>javascript:</strong> à la main, puis colle le script juste derrière (appui long, Coller) et valide. Il faut taper le mot toi-même : Chrome le retire quand il est collé.</li>
-      <li>Un écran blanc montre l'avancement (environ 2 minutes, ne ferme pas la page). À la fin, touche « Copier le résultat ».</li>
-      <li>Reviens ici et touche « Coller et appliquer ».</li>
-    </ol>
-    <div class="btns"><button type="button" class="btn" data-act="copy-script">Copier le script</button><button type="button" class="btn primary" data-act="paste">Coller et appliquer</button></div>
-    <p class="info" style="margin-top:12px">Si « Coller et appliquer » ne marche pas, colle le résultat dans ce cadre :</p>
-    <label class="sr" for="imp">Résultat à importer</label>
-    <textarea id="imp" placeholder="Colle ici le résultat du script"></textarea>
-    <div class="btns"><button type="button" class="btn" data-act="import">Appliquer les prix</button></div>
-  </details>`;
+    : `<p class="info">Prix estimatifs, en attendant le prochain relevé de prix.nc. Tes modifications à la main sont marquées « modifié ».</p>`;
   R_ORDER.forEach(r => {
     const ids = Object.keys(ING).filter(id => ING[id][1] === r).sort((a, b) => ING[a][0].localeCompare(ING[b][0], 'fr'));
     html += `<div class="group"><h3>${R_NAME[r]}</h3>` + ids.map(id => `
@@ -693,22 +686,21 @@ function appliquerPrix(j){
   S.priceInfo = {date: (j && j.date) || '', n: n};
   return n;
 }
-function importPrices(text){
-  let j;
-  try { j = JSON.parse(String(text).trim()); } catch (e) { toast('Texte illisible : colle le résultat complet'); return; }
-  const n = appliquerPrix(j && j.prices ? j : {prices: j});
-  if (!n){ toast('Aucun prix reconnu'); return; }
-  toast(n + ' prix mis à jour');
-  renderAll();
-}
+let dernierChargement = 0;
 async function chargerPrixAuto(){
+  dernierChargement = Date.now();
   try {
     const r = await fetch('prix.json?t=' + Date.now(), {cache: 'no-store'});
     if (!r.ok) return;
     const j = await r.json();
-    if (appliquerPrix(j)) renderAll();
-  } catch (e) { /* hors ligne, ou page sans prix.json : on garde les prix connus */ }
+    if (!appliquerPrix(j)) return;
+    const a = document.activeElement;
+    if (a && a.tagName === 'INPUT' && $('#panel').contains(a)){ renderGauge(); save(); } else renderAll();
+  } catch (e) { /* hors ligne, ou page sans prix.json : on garde les derniers prix connus */ }
 }
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() - dernierChargement > 3600000) chargerPrixAuto();
+});
 const SHARE_URL = 'https://blrobical-svg.github.io/Menu-du-cailloux/';
 const SHARE_TXT = "Menu Caillou : les menus et la liste de courses de la semaine, chiffrés en francs avec les prix de prix.nc. Ouvre le lien puis « Ajouter à l'écran d'accueil » pour l'installer.";
 async function partager(){
@@ -753,12 +745,6 @@ document.addEventListener('click', e => {
     case 'copy': copyList(); return;
     case 'reset-prices': S.prices = {}; break;
     case 'share': partager(); return;
-    case 'copy-script': copyText($('#ps-src').textContent.trim(), 'Script copié'); return;
-    case 'import': importPrices(($('#imp') || {}).value || ''); return;
-    case 'paste':
-      if (navigator.clipboard && navigator.clipboard.readText) navigator.clipboard.readText().then(t => importPrices(t), () => toast('Accès refusé : colle le résultat dans le cadre'));
-      else toast('Colle le résultat dans le cadre');
-      return;
   }
   renderAll();
 });
@@ -786,6 +772,58 @@ if (!S.menu.length) generate(); else ajusterMenu();
 S.dinners = S.menu.length;
 renderAll();
 chargerPrixAuto();
+
+/* ---------- Publicité : deux zones (haut et bas) ---------- */
+const ADS = {
+  // 'demo'    : espaces réservés, visibles pour les essais
+  // 'maison'  : annonces de commerçants locaux, à saisir ci-dessous (sans cookies)
+  // 'adsense' : Google AdSense (renseigner client, haut et bas)
+  // 'off'     : aucune zone affichée
+  mode: 'demo',
+  contact: '',   // e-mail pour le lien « Annoncer ici » (facultatif)
+  maison: {
+    haut: [],    // exemple : {titre: 'Boulangerie du Centre', texte: 'Pain frais tous les jours', lien: 'https://exemple.nc'}
+    bas: []
+  },
+  adsense: {client: '', haut: '', bas: ''}   // exemple : client 'ca-pub-1234567890123456', haut '1234567890', bas '0987654321'
+};
+function pubHtml(lieu){
+  const lbl = '<span class="ad-lbl">Publicité</span>';
+  if (ADS.mode === 'adsense' && /^ca-pub-\d+$/.test(ADS.adsense.client) && /^\d+$/.test(ADS.adsense[lieu] || '')){
+    return lbl + '<ins class="adsbygoogle" style="display:block" data-ad-client="' + ADS.adsense.client + '" data-ad-slot="' + ADS.adsense[lieu] + '" data-ad-format="auto" data-full-width-responsive="true"></ins>';
+  }
+  const liste = ADS.mode === 'maison' ? (ADS.maison[lieu] || []).filter(a => a && a.titre && /^https?:\/\//.test(a.lien || '')) : [];
+  if (liste.length){
+    const a = liste[Math.floor(Math.random() * liste.length)];
+    return lbl + '<a class="ad-card" href="' + esc(a.lien) + '" target="_blank" rel="sponsored noopener"><b>' + esc(a.titre) + '</b><span>' + esc(a.texte || '') + '</span></a>';
+  }
+  const mail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ADS.contact || '') ? '<a href="mailto:' + esc(ADS.contact) + '?subject=' + encodeURIComponent('Annoncer sur Menu Caillou') + '">Annoncer ici</a>' : '';
+  return lbl + '<div class="ad-slot"><span>Espace publicitaire (' + (lieu === 'haut' ? 'haut' : 'bas') + ')</span>' + mail + '</div>';
+}
+function mesurerPub(){
+  const r = document.documentElement, h = $('#ad-haut'), b = $('#ad-bas');
+  r.style.setProperty('--ad-top-h', (h.hidden ? 0 : Math.ceil(h.getBoundingClientRect().height)) + 'px');
+  r.style.setProperty('--ad-bot-h', (b.hidden ? 0 : Math.ceil(b.getBoundingClientRect().height)) + 'px');
+}
+function afficherPub(){
+  const haut = $('#ad-haut'), bas = $('#ad-bas');
+  if (ADS.mode === 'off'){ haut.hidden = true; bas.hidden = true; return; }
+  haut.innerHTML = pubHtml('haut'); bas.innerHTML = pubHtml('bas');
+  haut.hidden = false; bas.hidden = false;
+  document.documentElement.classList.add('ad-on');
+  mesurerPub();
+  if (window.ResizeObserver){ const ro = new ResizeObserver(mesurerPub); ro.observe(haut); ro.observe(bas); }
+  window.addEventListener('resize', mesurerPub);
+  if (ADS.mode === 'adsense' && document.querySelector('.adsbygoogle')){
+    $('#about-priv').textContent = "Menu Caillou ne collecte aucune donnée personnelle. Les publicités sont fournies par Google AdSense, qui peut utiliser des cookies selon sa propre politique.";
+    const s = document.createElement('script');
+    s.async = true; s.crossOrigin = 'anonymous';
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADS.adsense.client;
+    s.onload = () => document.querySelectorAll('.adsbygoogle').forEach(() => { try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {} });
+    document.head.appendChild(s);
+  }
+}
+afficherPub();
 
 /* ---------- Installation sur l'écran d'accueil et mode hors ligne ---------- */
 let installEvt = null;
