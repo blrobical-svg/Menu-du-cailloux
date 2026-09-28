@@ -12,6 +12,7 @@ import subprocess
 import sys
 import time
 import unicodedata
+from collections import Counter
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -24,8 +25,13 @@ except Exception:
 
 BASE = os.environ.get('PRIXNC_BASE', 'https://prix.nc')
 PAUSE = float(os.environ.get('PRIXNC_PAUSE', '0.35'))
-COMMUNE = 1  # Noumea
+COMMUNE = 1  # Noumea (recherche de produits)
+COMMUNE_RELEVES = '1'  # code de Noumea dans les releves de prix
+AGE_MAX_MS = 120 * 24 * 3600 * 1000  # on ignore les releves de plus de 120 jours
 DOSSIER = os.path.dirname(os.path.abspath(__file__))
+SORTIE = os.environ.get('PRIXNC_SORTIE', 'prix-nc.json')   # nom du fichier resultat
+MINIMUM = int(os.environ.get('PRIXNC_MIN', '0'))            # en dessous, on n'ecrit rien (protege les bons prix)
+FUSION = os.environ.get('PRIXNC_FUSION') == '1'             # garde l'ancien prix d'un ingredient introuvable cette fois
 
 # identifiant : (termes cherches, unite kg|L|pce, doit contenir, ne doit pas contenir, contenance d'une piece en kg ou L)
 R = {
@@ -82,6 +88,11 @@ def norm(s):
     return ''.join(c for c in s if not unicodedata.combining(c))
 
 
+def nom_enseigne(s):
+    s = re.sub(r'\s+', ' ', str(s or '')).strip()
+    return re.sub(r'[^\W\d_]+', lambda m: m.group(0).capitalize(), s)
+
+
 class Refus(Exception):
     pass
 
@@ -108,6 +119,40 @@ def recherche(terme, page):
         BASE, urllib.parse.quote(terme), COMMUNE, page)
     j = appel(url)
     return (j.get('_embedded') or {}).get('produitsprix') or []
+
+
+def enseigne_moins_chere(id_produit, vus):
+    """Premier releve recent a Noumea, du moins cher au plus cher (les prix en promotion passent apres)."""
+    maintenant = time.time() * 1000
+    promo = None
+    total = 1
+    page = 0
+    while page < min(total, 5):
+        url = '%s/api/v1/relevesprix/search/findByIdProduitInOrderByPrixParUniteAscPrixAscMagasinAsc?idProduit=%s' % (
+            BASE, urllib.parse.quote(str(id_produit)))
+        if page:
+            url += '&page=%d' % page
+        j = appel(url)
+        time.sleep(PAUSE)
+        total = (j.get('page') or {}).get('totalPages') or 1
+        for r in (j.get('_embedded') or {}).get('relevesprix') or []:
+            vus[str(r.get('idCommune'))] += 1
+            if str(r.get('idCommune')) != COMMUNE_RELEVES:
+                continue
+            d = r.get('dateReleve')
+            if isinstance(d, (int, float)) and maintenant - d > AGE_MAX_MS:
+                continue
+            try:
+                if not float(r.get('prixParUnite')) > 0:
+                    continue
+            except (TypeError, ValueError):
+                continue
+            if r.get('promotion'):
+                promo = promo or r
+                continue
+            return r
+        page += 1
+    return promo
 
 
 def genre_unite(p):
@@ -146,7 +191,7 @@ def copier(texte):
 def main():
     print('Menu Caillou : relevé des prix sur prix.nc (Nouméa)')
     print('Compte 2 à 3 minutes. Ne ferme pas cette fenêtre.\n')
-    prix, rapport = {}, []
+    prix, rapport, enseignes, communes_vues = {}, [], {}, Counter()
     ids = list(R)
     try:
         for i, ident in enumerate(ids, 1):
@@ -174,6 +219,7 @@ def main():
                     continue
                 genre = genre_unite(p)
                 v = None
+                facteur = 1
                 if unite == 'kg' and genre == 'kg':
                     v = valeur
                 elif unite == 'L' and genre == 'L':
@@ -183,16 +229,32 @@ def main():
                         v = valeur
                     elif contenance and genre != '?':
                         v = valeur * contenance
+                        facteur = contenance
                 if v and v > 0:
-                    candidats.append((v, p.get('nom', '')))
+                    candidats.append((v, p.get('nom', ''), p.get('idProduit') or p.get('id'), facteur))
             candidats.sort(key=lambda c: c[0])
             bas = candidats[:3]
             if not bas:
                 rapport.append('%s : aucun produit trouvé (le prix de départ reste utilisé)' % ident)
                 continue
-            val = int(round(mediane([c[0] for c in bas])))
-            prix[ident] = val
-            rapport.append('%s : %d F  (%s)' % (ident, val, ' | '.join('%s %d' % (c[1], round(c[0])) for c in bas)))
+            ref = bas[(len(bas) - 1) // 2]  # produit du milieu parmi les moins chers
+            val = ref[0]
+            enseigne = ''
+            try:
+                r = enseigne_moins_chere(ref[2], communes_vues) if ref[2] else None
+            except Refus:
+                raise
+            except Exception:
+                r = None
+            if r:
+                val = float(r['prixParUnite']) * ref[3]
+                enseigne = nom_enseigne(r.get('magasin'))
+            prix[ident] = int(round(val))
+            if enseigne:
+                enseignes[ident] = enseigne
+            rapport.append('%s : %d F chez %s  (produit : %s ; les 3 moins chers : %s)' % (
+                ident, prix[ident], enseigne or 'enseigne inconnue', ref[1],
+                ' | '.join('%s %d' % (c[1], round(c[0])) for c in bas)))
     except Refus as e:
         print('\nArrêt : %s.' % e)
         print('Réessaie plus tard. Aucun prix n\'a été modifié.')
@@ -202,19 +264,41 @@ def main():
         print('Vérifie ta connexion internet puis relance.')
         return 1
 
-    resultat = {'source': 'prix.nc', 'commune': 'Noumea', 'date': date.today().isoformat(), 'prices': prix}
+    if len(prix) < MINIMUM:
+        print('\nSeulement %d prix trouvés (minimum attendu : %d). Rien n\'est modifié.' % (len(prix), MINIMUM))
+        return 1
+    chemin = os.path.join(DOSSIER, SORTIE)
+    if FUSION:
+        try:
+            with open(chemin, encoding='utf-8') as f:
+                ancien = json.load(f)
+        except Exception:
+            ancien = {}
+        nouveaux = set(prix)
+        gardes = {k: v for k, v in (ancien.get('stores') or {}).items() if k not in nouveaux}
+        gardes.update(enseignes)
+        enseignes = gardes
+        fusion = dict(ancien.get('prices') or {})
+        fusion.update(prix)
+        prix = fusion
+    resultat = {'source': 'prix.nc', 'commune': 'Noumea', 'date': date.today().isoformat(), 'prices': prix, 'stores': enseignes}
     texte = json.dumps(resultat, separators=(',', ':'))
-    with open(os.path.join(DOSSIER, 'prix-nc.json'), 'w', encoding='utf-8') as f:
+    with open(chemin, 'w', encoding='utf-8') as f:
         f.write(texte)
     with open(os.path.join(DOSSIER, 'rapport.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(rapport) + '\n')
+        f.write('\nCodes de commune vus dans les relevés : %s\n' % dict(communes_vues.most_common(8)))
 
-    print('\n%d prix trouvés sur %d ingrédients.' % (len(prix), len(ids)))
+    print('\n%d prix trouvés sur %d ingrédients, dont %d avec leur enseigne.' % (len(prix), len(ids), len(enseignes)))
+    if not enseignes:
+        print('ATTENTION : aucune enseigne de Nouméa identifiée (voir la fin de rapport.txt).')
     print('Détail des produits retenus : rapport.txt (dans le même dossier).\n')
-    if copier(texte):
+    if os.environ.get('CI'):
+        print('Fichier écrit : %s' % SORTIE)
+    elif copier(texte):
         print('Le résultat est COPIÉ. Ouvre Menu Caillou > Prix > « Coller et appliquer ».')
     else:
-        print('Copie automatique impossible. Ouvre prix-nc.json, copie tout son contenu,')
+        print('Copie automatique impossible. Ouvre %s, copie tout son contenu,' % SORTIE)
         print('puis colle-le dans Menu Caillou > Prix.')
     return 0
 

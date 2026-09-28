@@ -1,0 +1,46 @@
+MENU CAILLOU - MISE À JOUR 100 % AUTOMATIQUE DES PRIX
+
+Une seule installation (environ 10 minutes). Ensuite, plus rien à faire :
+- chaque lundi matin (heure de Nouméa), un robot gratuit de GitHub relève les prix sur prix.nc ;
+- à chaque ouverture, l'appli lit ces prix toute seule.
+
+Ce qu'il te faut : un compte GitHub gratuit. Tout se fait dans le navigateur, téléphone compris.
+
+1. Crée un compte sur github.com.
+
+2. Crée un dépôt : bouton « New repository ». Nom : menu-caillou. Choisis « Public » et coche « Add a README file ». Valide (« Create repository »).
+   (Public est obligatoire pour l'hébergement gratuit. Ne mets rien de privé dedans : il ne contient que l'appli et les prix.)
+
+3. Envoie 3 fichiers de ce dossier : dans le dépôt, « Add file » > « Upload files », choisis :
+   index.html, maj_prix.py, prix.json
+   Puis « Commit changes ».
+
+4. Crée le robot : « Add file » > « Create new file ».
+   Dans le champ du nom, tape exactement : .github/workflows/maj-prix.yml
+   (les barres créent les dossiers toutes seules).
+   Ouvre le fichier maj-prix.yml de ce dossier, copie tout son contenu et colle-le dans la grande zone. Puis « Commit changes ».
+
+5. Active l'hébergement : « Settings » > « Pages ». Dans « Build and deployment », Source : « Deploy from a branch ». Branche : main, dossier : / (root). « Save ».
+
+6. Autorise le robot à enregistrer les prix : « Settings » > « Actions » > « General » > « Workflow permissions » > « Read and write permissions » > « Save ».
+
+7. Lance un premier relevé : onglet « Actions » > « Mise à jour des prix » > « Run workflow » > « Run workflow ».
+   Attends 3 à 5 minutes. Pastille verte = c'est bon. Pastille rouge = ouvre-la et envoie-moi le message d'erreur.
+
+8. Ouvre ton appli : https://TON-PSEUDO.github.io/menu-caillou/
+   (elle apparaît 1 à 2 minutes après l'étape 5). Dans Chrome : menu ⋮ > « Ajouter à l'écran d'accueil ».
+   Dans l'onglet Prix, tu dois voir « Prix prix.nc du ... ».
+
+Déjà installé la version précédente ?
+Envoie de nouveau index.html et maj_prix.py (« Add file » > « Upload files », mêmes noms : ils remplacent les anciens), puis relance un relevé (étape 7). Rien d'autre à refaire.
+
+Enseignes
+Dans la liste de courses, chaque article indique l'enseigne où son prix est le plus bas à Nouméa (relevés de moins de 120 jours, hors promotions). Le bouton « Par enseigne » regroupe la liste magasin par magasin, avec le sous-total de chacun.
+Si aucune enseigne n'apparaît après le relevé, ouvre rapport.txt dans le dépôt et envoie-moi sa dernière ligne.
+
+Bon à savoir
+- Tes réglages (foyer, budget, menu, prix modifiés à la main) restent sur ton téléphone. Un prix que tu modifies toi-même passe avant celui de prix.nc.
+- Pour relancer un relevé quand tu veux : « Actions » > « Run workflow ».
+- Si un relevé échoue ou trouve moins de 25 prix, l'ancien fichier de prix est conservé : rien n'est cassé.
+- GitHub peut mettre en pause les robots d'un dépôt sans activité pendant 60 jours. Si ça arrive, un bouton « Enable » apparaît dans l'onglet Actions.
+- Le robot tourne sur les serveurs de GitHub. Si prix.nc les bloque, le relevé échouera : dis-le-moi.

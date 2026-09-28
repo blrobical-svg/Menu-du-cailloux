@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Menu Caillou</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F6F5; --surface:#FFFFFF; --ink:#0B2B33; --muted:#4F6B70; --line:#D5E3E1;
+  --teal:#0E7C86; --teal-ink:#FFFFFF; --pale:#D7EEEC; --coral:#C9432A; --coral-pale:#FBE3DD;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A1E23; --surface:#11303A; --ink:#E6F3F1; --muted:#93B3B3; --line:#1F4550;
+    --teal:#3FB7BF; --teal-ink:#06262B; --pale:#173C45; --coral:#FF8A6B; --coral-pale:#3A1F19;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A1E23; --surface:#11303A; --ink:#E6F3F1; --muted:#93B3B3; --line:#1F4550;
+  --teal:#3FB7BF; --teal-ink:#06262B; --pale:#173C45; --coral:#FF8A6B; --coral-pale:#3A1F19;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;}
+main{max-width:640px;margin:0 auto;padding:20px 16px 48px;}
+h1,h2{font-family:var(--display);margin:0;letter-spacing:-.01em;}
+h1{font-size:30px;font-weight:700;line-height:1.05;}
+h2{font-size:20px;font-weight:700;}
+.sub{margin:6px 0 0;color:var(--muted);font-size:15px;}
+button{font:inherit;color:inherit;cursor:pointer;}
+:focus-visible{outline:3px solid var(--teal);outline-offset:2px;border-radius:6px;}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+
+/* réglages */
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0 14px;}
+.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 4px 2px;}
+.step{display:flex;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;height:48px;overflow:hidden;}
+.step button{flex:0 0 38px;height:100%;border:0;background:transparent;font-size:20px;color:var(--teal);}
+.step button:active{background:var(--pale);}
+.step output,.step input{flex:1;min-width:0;text-align:center;font-weight:600;font-size:17px;font-variant-numeric:tabular-nums;border:0;background:transparent;color:var(--ink);font-family:inherit;padding:0;}
+.step input:focus-visible{outline:none;}
+.step:focus-within{border-color:var(--teal);box-shadow:0 0 0 2px var(--pale);}
+
+/* jauge du budget */
+.gauge{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 18px 20px;}
+.gauge .lbl{font-size:14px;color:var(--muted);}
+.total{font-family:var(--display);font-weight:700;font-size:46px;line-height:1.05;margin:2px 0 4px;font-variant-numeric:tabular-nums;letter-spacing:-.02em;}
+.gauge.over .total{color:var(--coral);}
+.msg{margin:0;font-size:15px;font-weight:600;}
+.gauge.over .msg{color:var(--coral);}
+.per{margin:2px 0 0;font-size:14px;color:var(--muted);min-height:1.4em;}
+.bar{position:relative;height:22px;background:var(--pale);border-radius:11px;margin-top:14px;overflow:hidden;}
+.fill{position:absolute;left:0;top:0;bottom:0;width:0;color:var(--teal);background:currentColor;transition:width .6s cubic-bezier(.3,.7,.2,1);}
+.fill::after{content:"";position:absolute;top:0;bottom:0;right:-11px;width:11px;background:radial-gradient(circle at 0 12px,currentColor 10.5px,transparent 11px) 0 0/11px 24px repeat-y;}
+.gauge.over .fill{color:var(--coral);}
+.fill.zero::after{display:none;}
+
+/* onglets */
+.tabs{display:flex;gap:4px;background:var(--pale);border-radius:14px;padding:4px;margin:18px 0 16px;}
+.tabs button{flex:1;border:0;background:transparent;border-radius:10px;padding:10px 6px;font-weight:600;font-size:15px;color:var(--muted);}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12);}
+
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;font-weight:600;font-size:15px;}
+.btn.primary{background:var(--teal);color:var(--teal-ink);border-color:var(--teal);}
+.btn:active{transform:translateY(1px);}
+.lnk{border:0;background:transparent;color:var(--teal);font-weight:600;font-size:15px;padding:8px 6px;min-height:36px;}
+.lnk:hover{text-decoration:underline;}
+.empty{color:var(--muted);padding:18px 4px;}
+
+/* plats */
+.recipes{list-style:none;margin:0;padding:0;display:grid;gap:10px;}
+.rec{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:4px 12px 2px;}
+.rec-head{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;width:100%;text-align:left;border:0;background:transparent;padding:10px 0 6px;}
+.ico{width:44px;height:44px;border-radius:50%;background:var(--pale);display:grid;place-items:center;font-size:22px;}
+.rec-main{display:grid;gap:3px;min-width:0;}
+.rec-name{font-weight:600;font-size:16px;line-height:1.25;}
+.rec-meta{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);}
+.chip{background:var(--pale);color:var(--ink);border-radius:999px;padding:1px 9px;font-size:12px;font-weight:600;}
+.rec-price{text-align:right;display:grid;}
+.rec-price strong{font-variant-numeric:tabular-nums;font-size:16px;}
+.rec-price small{font-size:12px;color:var(--muted);}
+.lines{list-style:none;margin:2px 0 4px;padding:8px 0 4px;border-top:1px dashed var(--line);display:grid;gap:4px;font-size:14px;}
+.lines li{display:grid;grid-template-columns:1fr auto 74px;gap:10px;}
+.lines li span:nth-child(2){color:var(--muted);}
+.lines li span:last-child{text-align:right;font-variant-numeric:tabular-nums;}
+.rec-act{display:flex;gap:4px;justify-content:flex-end;padding-bottom:2px;}
+.add{display:block;margin-top:14px;}
+.add select{width:100%;height:48px;border-radius:14px;border:1px dashed var(--teal);background:transparent;color:var(--teal);font:inherit;font-weight:600;padding:0 12px;}
+
+/* courses et prix */
+.group{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px 6px;margin-bottom:12px;}
+.group h3{font-family:var(--display);font-size:17px;margin:0 0 6px;display:flex;justify-content:space-between;gap:10px;}
+.group h3 .sub{font-variant-numeric:tabular-nums;color:var(--teal);}
+.item .st{display:block;font-size:12px;color:var(--muted);font-weight:400;line-height:1.3;}
+.seg{display:flex;gap:4px;background:var(--pale);border-radius:12px;padding:3px;margin-bottom:12px;}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:8px;font-weight:600;font-size:14px;color:var(--muted);}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12);}
+.items{list-style:none;margin:0;padding:0;}
+.item{display:grid;grid-template-columns:28px 1fr auto 70px;gap:8px;align-items:center;min-height:44px;border-top:1px solid var(--line);font-size:15px;}
+.item:first-child{border-top:0;}
+.item input[type=checkbox]{width:22px;height:22px;accent-color:var(--teal);margin:0;}
+.item .q{color:var(--muted);font-size:14px;}
+.item .c{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;}
+.item.done .nm,.item.done .q,.item.done .c{opacity:.45;text-decoration:line-through;}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;}
+.foot strong{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums;}
+.prow{display:grid;grid-template-columns:1fr 112px;gap:10px;align-items:center;min-height:50px;border-top:1px solid var(--line);}
+.prow:first-child{border-top:0;}
+.prow .nm{font-size:15px;}
+.prow.mod .nm::after{content:" • modifié";color:var(--teal);font-size:12px;font-weight:600;}
+.pin{display:flex;align-items:center;gap:6px;}
+.pin input{width:64px;height:38px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);text-align:right;font:inherit;font-variant-numeric:tabular-nums;padding:0 8px;}
+.pin span{font-size:12px;color:var(--muted);white-space:nowrap;}
+details.upd{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:12px;}
+details.upd summary{font-weight:600;cursor:pointer;min-height:28px;}
+details.upd ol{margin:10px 0 12px;padding-left:20px;font-size:14px;color:var(--muted);}
+details.upd li{margin-bottom:6px;}
+details.upd textarea{width:100%;min-height:96px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:12px ui-monospace,Menlo,monospace;padding:8px;margin:4px 0 10px;}
+details.upd .btns{display:flex;gap:8px;flex-wrap:wrap;}
+.info{font-size:14px;color:var(--muted);margin:0 0 12px;}
+.note{margin-top:22px;font-size:13px;color:var(--muted);}
+.note p{margin:0 0 8px;}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;}
+.toast.show{opacity:1;transform:translate(-50%,0);}
+@media (max-width:380px){
+  .total{font-size:40px;}
+}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;animation:none !important;}
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Menu Caillou</h1>
+    <p class="sub">Tes dîners de la semaine, chiffrés en francs pacifique.</p>
+  </header>
+
+  <section class="controls" aria-label="Réglages du foyer">
+    <div class="field">
+      <label for="v-adults">Adultes</label>
+      <div class="step">
+        <button type="button" data-act="adults-" aria-label="Un adulte de moins">−</button>
+        <output id="v-adults">2</output>
+        <button type="button" data-act="adults+" aria-label="Un adulte de plus">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="v-kids">Enfants</label>
+      <div class="step">
+        <button type="button" data-act="kids-" aria-label="Un enfant de moins">−</button>
+        <output id="v-kids">2</output>
+        <button type="button" data-act="kids+" aria-label="Un enfant de plus">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="v-dinners">Dîners</label>
+      <div class="step">
+        <button type="button" data-act="dinners-" aria-label="Un dîner de moins">−</button>
+        <output id="v-dinners">5</output>
+        <button type="button" data-act="dinners+" aria-label="Un dîner de plus">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="in-budget">Budget en francs</label>
+      <div class="step">
+        <button type="button" data-act="budget-" aria-label="Baisser le budget de 1 000 francs">−</button>
+        <input id="in-budget" type="text" inputmode="numeric" autocomplete="off" value="15 000">
+        <button type="button" data-act="budget+" aria-label="Augmenter le budget de 1 000 francs">+</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="gauge" id="gauge" aria-live="polite">
+    <div class="lbl">Courses de la semaine</div>
+    <div class="total" id="g-total">0 F</div>
+    <p class="msg" id="g-msg"></p>
+    <p class="per" id="g-per"></p>
+    <div class="bar" id="g-bar" role="progressbar" aria-label="Part du budget utilisée" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="fill zero" id="g-fill"></div>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" data-tab="menu" aria-selected="true">Menu</button>
+    <button type="button" role="tab" data-tab="shop" aria-selected="false">Courses</button>
+    <button type="button" role="tab" data-tab="prices" aria-selected="false">Prix</button>
+  </nav>
+
+  <section id="panel" role="tabpanel"></section>
+
+  <footer class="note">
+    <p>Les prix de départ sont des estimations, à remplacer par les relevés officiels de prix.nc (onglet Prix). Après une mise à jour, chaque prix est le plus bas relevé à Nouméa : tes courses peuvent donc coûter un peu plus cher. Les plats sont chiffrés au prorata des quantités ; la liste de courses arrondit les boîtes et les pièces à l'unité. Un enfant compte pour 0,6 portion d'adulte.</p>
+  </footer>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="text/plain" id="ps-src">(async () => { if (!/prix\.nc$/.test(location.hostname)) { alert('Ouvre d abord le site prix.nc puis relance le script.'); return; } const COMMUNE = 1; const sleep = ms => new Promise(r => setTimeout(r, ms)); const norm = s => String(s || '').toLowerCase().replace(/œ/g, 'oe').normalize('NFD').replace(/[\u0300-\u036f]/g, ''); const R = { oignon:[['oignon'],'kg',/oignon/,/frit|surgel|poudre|bocal|conserve|vinaigre|aigre|chips|rondelle|echalote/], ail:[['ail'],'kg',/\bail\b/,/poudre|semoule|sauce|pain|beurre|fromage|granule|aioli|assaison|epice|melange|pate|creme/], carotte:[['carotte'],'kg',/carotte/,/rape|jus|bocal|conserve|surgel|petits? pois|boite|soupe|salade|pate/], pdt:[['pomme de terre'],'kg',/pommes? de terre/,/chips|puree|frite|surgel|flocon|gratin|roti|salade|boite|conserve|croquette|rosti/], tomate:[['tomate'],'kg',/tomate/,/concass|coulis|sauce|concentre|seche|pelee|ketchup|boite|conserve|bocal|puree|pulpe|jus|surgel|soupe|pizza|sandwich|farci|pate/], courgette:[['courgette'],'kg',/courgette/,/surgel|conserve|bocal|boite|gratin|poele|soupe|puree|pate/], chou:[['chou'],'kg',/\bchou\b/,/fleur|bruxelles|kimchi|choucroute|conserve|bocal|rave|salade/], poivron:[['poivron'],'kg',/poivron/,/conserve|bocal|boite|surgel|poudre|farci|pate|sauce/], concombre:[['concombre'],'kg',/concombre/,/cornichon|bocal|conserve|salade|sauce|creme|soin|masque/], salade:[['laitue','salade'],'pce',/laitue|batavia|romaine|feuille de chene|salade verte/,/sachet|sauce|assaison|vinaigrette|pate|riz|thon|poulet|composee|piemontaise|fruits|bol|boite|conserve|melange|mesclun|cesar|lardon|jambon|tomate/], avocat:[['avocat'],'pce',/avocat/,/huile|sauce|guacamole|creme|shampo|soin|masque|beurre|dip|puree/,0.25], citron:[['citron vert','lime'],'kg',/citron.? vert|\blimes?\b/,/jus|sirop|the |boisson|bonbon|huile|nettoy|bouteille|soda|biere|liqueur|vinaigre|glace|sorbet/], gingembre:[['gingembre'],'kg',/gingembre/,/poudre|moulu|the |tisane|confit|biscuit|biere|sirop|jus|pain d|bonbon|capsule|infusion|shot|huile|pate/], champi:[['champignon'],'kg',/champignon/,/conserve|boite|bocal|surgel|seche|sauce|soupe|creme|pizza|poelee|lamelle|pate|farce/], igname:[['igname'],'kg',/igname/,/chips|farine|frite|surgel/], manioc:[['manioc'],'kg',/manioc/,/farine|chips|tapioca|frite|surgel|pate|gari|pain/], patate:[['patate douce'],'kg',/patate/,/chips|frite|surgel|puree|pate/], banane:[['banane'],'kg',/banane/,/chips|seche|biscuit|yaourt|jus|sirop|compote|cake|gateau|boisson|cereale|lait|glace|pate|farine|confiture/], poulet:[['poulet entier','poulet'],'kg',/poulet/,/nugget|cordon|pane|fume|cuisse|filet|aile|escalope|hache|saucisse|salade|sandwich|plat|boite|conserve|pilon|blanc|manchon|brochette|roti|kebab|jambon|pate|soupe|bouillon|chien|chat|croquette|sauce|tikka|curry|riz|nouille/], cuisse:[['cuisse de poulet','cuisse'],'kg',/cuisse/,/nugget|pane|fume|canard|dinde|lapin|grenouille|cordon|roti|sauce|jambon|pate|chien/], hache:[['hache','boeuf hache'],'kg',/hache/,/porc|poulet|dinde|boulette|conserve|surgel|nugget|burger|legume|soja|vegetal|tomate|sauce|lasagne|hachis|parmentier|plat|pate|oignon|herbes/], boeuf:[['boeuf'],'kg',/boeuf|bovin/,/hache|conserve|corned|bouillon|cube|saucisse|burger|nouille|plat|sauce|soupe|pate|fume|tacos|ravioli|chili|bourguignon|surgel|chien|chat|croquette|kebab|carpaccio|seche|grison|pizza|riz|sandwich|arome|epice|assaison|marinade/], saucisse:[['saucisse'],'kg',/saucisse/,/seche|cocktail|aperitif|strasbourg|lentille|conserve|boite|bocal|chien|chat|surgel|choucroute|hot ?dog|knacki|chorizo|pate|pizza|sandwich/], cerf:[['cerf'],'kg',/cerf/,/pate|saucisson|conserve|terrine|rillette|fume|seche|chien|nourriture|croquette|biscuit|bonbon/], poisson:[['thon','mahi','wahoo','marlin','poisson frais'],'kg',/thon|mahi|wahoo|marlin|poisson/,/boite|conserve|surgel|pane|baton|fume|huile|sauce|sardine|maquereau|chat|chien|litiere|salade|rillette|pate|croquette|nugget|plat|riz|pizza|sandwich|tartinable|bouillon|soupe/], crevette:[['crevette'],'kg',/crevette/,/chips|cracker|nem|beignet|sauce|soupe|salade|plat|riz|nouille|bouillon|cocktail|conserve|boite|bocal|pate|sushi|rouleau|arome|pizza|croquette|chien|chat|epice|assaison/], jambon:[['jambon'],'kg',/jambon/,/cru|sec|pizza|sandwich|quiche|croque|salade|chien|puree|pate|mousse|beurre|fromage|feuillet|nouille|tartinable|plat|omelette|gratin|lardon/], oeuf:[['oeuf','oeufs frais'],'pce',/\boeufs?\b/,/chocolat|paques|kinder|plat|mayonn|nouille|pate|poudre|lait|cocotte|dur|coque|colorant|gaufre|crepe|biscuit|tapioca|jaune|blanc|liquide|surprise|cadeau|jouet|decor|teinture|ballon|gel|shampo|creme|omelette|salade|sandwich|pain/], creme:[['creme fraiche','creme'],'pce',/creme.*fraiche|fraiche.*creme/,/soin|jour|nuit|main|visage|corps|solaire|glace|dessert|chocolat|vanille|patissiere|vegetal|soja|anti|depil|rasage|bebe|hydra|pommade|douche|chantilly/,0.2], fromage:[['fromage rape','rape'],'kg',/(fromage|emmental|gruyere|mozzarella|cheddar).*rape|rape.*(fromage|emmental|gruyere|mozzarella|cheddar)/,/pizza|plat|carotte|coco|legume|sauce|chips|snack|sandwich|burger|salade|tartinable|cracker|epice|assaison/], riz:[['riz'],'kg',/\briz\b/,/cuisine|saute|cantonais|pudding|lait|souffle|galette|gateau|vinaigre|farine|cracker|nouille|sauce|plat|salade|micro|express|the |boisson|dessert|huile|papier|cereale|barre|vermicelle|sushi|bouillie|creme|boite|conserve|chien|chat|croquette|pate|cake|snack|chips|semoule|bebe|infantile|onigiri|maki|tofu/], pates:[['spaghetti','pates'],'kg',/spaghetti|pates|coquillette|penne|tagliatelle|fusilli|macaroni/,/fraiche|brisee|feuilletee|sablee|levee|pizza|tartiner|amande|dentifrice|fruit|boite|conserve|chien|chat|sauce|plat|salade|cuisine|carbonara|bolognaise|lasagne|ravioli|tortellini|instantane|nouille|riz|cheveux|bebe|pate a|pate de/], lentille:[['lentille'],'kg',/lentille/,/boite|conserve|cuisine|saucisse|salade|soupe|plat|chips|pate|bocal|prepar|cuit|micro|sachet/], pois:[['pois chiche'],'pce',/pois chiche/,/houmous|hummus|salade|plat|falafel|farine|chips|creme|tartinable|snack|cuisine|puree/], haricot:[['haricot rouge'],'pce',/haricot.*rouge|rouge.*haricot|kidney/,/salade|plat|chili|cuisine|sec|graine|prepar|boeuf|viande|sauce/], tomconc:[['tomate concassee','tomate pelee'],'pce',/concass|pelee/,/plat|sauce|pizza|coulis|pate|chips|tapenade|soupe/], coco:[['lait de coco'],'pce',/lait de coco|lait coco/,/eau|huile|rape|shampo|biscuit|glace|boisson|sirop|sucre|farine|chips|dessert|yaourt|savon|soin|poudre|curry|riz|soupe|cheveux/,0.4], mais:[['mais'],'pce',/mais doux/,/pop|chips|huile|farine|cereale|semoule|gateau|chien|tortilla|surgel|epi|frais|creme|salade|plat|soupe|riz/], ptpois:[['petits pois'],'pce',/petits? pois/,/chiche|surgel|plat|soupe|puree|cuisine|salade|carotte|chips|snack|cassoulet|creme/], concentre:[['concentre de tomate','concentre'],'pce',/concentre.*tomate|tomate.*concentre/,/jus|sirop|fruit|cafe|lessive|bouillon|soupe|volaille|legume|boeuf|poisson|fond|fumet|arome/], farine:[['farine'],'kg',/farine/,/coco|riz|manioc|sarrasin|mais|avoine|chataigne|lait|bebe|infantile|poisson|complete|chien|chat|croquette|pois|soja|epeautre|pate|gateau|preparation|cake|biscuit|pain|gaufre|crepe|pizza|melange|levure|gluten|amande|noisette|banane|patate|igname|taro|lupin|lin|seigle|orge|millet|quinoa|tapioca/], huile:[['huile'],'L',/huile.*(tournesol|colza|vegetale|arachide|friture)|(tournesol|colza|vegetale|arachide).*huile/,/olive|massage|moteur|bain|corps|visage|essentielle|sesame|coco|argan|noix|thon|sardine|vidange|lubrifi|cheveux|amande|ricin|bebe|solaire|soin|lotion|tondeuse|chaine|outil|bois|teck|barbecue|beurre|savon|cire|shampo|graisse|spray|aerosol|degrippant|nettoy/], soja:[['sauce soja'],'L',/sauce.*soja|soja.*sauce/,/lait|boisson|yaourt|dessert|graine|pousse|steak|proteine|nouille|tofu|germe|creme|sucree|barbecue|nem|riz|plat/], curry:[['curry'],'pce',/curry/,/poulet|plat|riz|nouille|sauce|boite|soupe|pate|coco|lait|chips|cuisine|instantane|legume|pomme|creme|vindaloo|tikka|masala/] }; const box = document.createElement('div'); box.style.cssText = 'position:fixed;z-index:2147483647;top:0;left:0;right:0;bottom:0;overflow:auto;background:white;color:black;padding:16px;font:16px system-ui,sans-serif'; const title = document.createElement('div'); title.style.cssText = 'font-weight:700;font-size:20px;margin-bottom:8px'; title.textContent = 'Menu Caillou : prix.nc'; const st = document.createElement('div'); st.textContent = 'Demarrage...'; box.appendChild(title); box.appendChild(st); document.body.appendChild(box); async function search(term, page) { const url = location.origin + '/api/v1/produitsprix/search?nom=' + encodeURIComponent(term) + '&communeIds=' + COMMUNE + '&page=' + page + '&size=50'; const r = await fetch(url, {headers: {Accept: 'application/json'}}); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json(); return (j._embedded && j._embedded.produitsprix) || []; } const kindOf = p => { const u = norm(p.uniteLabelCourt || p.uniteLabel || ''); if (u === 'kg') return 'kg'; if (u === 'l') return 'L'; return ['g', 'ml', 'cl', '100g', '100ml', 'm', 'cm'].includes(u) ? '?' : 'u'; }; const median = arr => (arr.length & 1) ? arr[(arr.length - 1) / 2] : (arr[arr.length / 2 - 1] + arr[arr.length / 2]) / 2; const prices = {}, report = [], ids = Object.keys(R); let i = 0; for (const id of ids) { const [terms, unit, must, no, pack] = R[id]; i++; st.textContent = 'Recherche ' + i + ' sur ' + ids.length + ' : ' + id + ' (ne ferme pas cette page, environ 2 minutes)'; try { const seen = new Map(); for (const t of terms) { for (let page = 0; page < 3; page++) { const items = await search(t, page); items.forEach(p => seen.set(p.idProduit || p.id, p)); await sleep(350); if (items.length < 50) break; } } const cands = []; for (const p of seen.values()) { const n = norm(p.nom + ' ' + (p.variete || '')); if (!must.test(n) || no.test(n)) continue; const price = Number(p.meilleurPrixParUnite); if (!(price > 0)) continue; const kind = kindOf(p); let v = null; if (unit === 'kg' && kind === 'kg') v = price; else if (unit === 'L' && kind === 'L') v = price; else if (unit === 'pce') { if (kind === 'u') v = price; else if (pack && kind !== '?') v = price * pack; } if (v > 0) cands.push({v, nom: p.nom}); } cands.sort((a, b) => a.v - b.v); const low = cands.slice(0, 3); if (!low.length) { report.push(id + ' : aucun produit trouve'); continue; } const val = Math.round(median(low.map(c => c.v))); prices[id] = val; report.push(id + ' : ' + val + ' F  (' + low.map(c => c.nom + ' ' + Math.round(c.v)).join(' | ') + ')'); } catch (e) { report.push(id + ' : erreur ' + e.message); if (/HTTP 4(29|03)|HTTP 5/.test(e.message)) break; } } const result = {source: 'prix.nc', commune: 'Noumea', date: new Date().toISOString().slice(0, 10), prices}; const json = JSON.stringify(result); box.textContent = ''; const head = document.createElement('div'); head.style.cssText = 'font-weight:700;font-size:18px;margin-bottom:8px'; head.textContent = Object.keys(prices).length + ' prix trouves sur ' + ids.length + '. Appuie sur Copier, puis retourne dans Menu Caillou.'; const ta = document.createElement('textarea'); ta.value = json; ta.readOnly = true; ta.style.cssText = 'width:90vw;height:90px;font:12px monospace;box-sizing:border-box'; const btn = document.createElement('button'); btn.textContent = 'Copier le resultat'; btn.style.cssText = 'font:700 17px system-ui;padding:12px 16px;margin:10px 8px 10px 0;border:0;border-radius:10px;background:teal;color:white'; btn.onclick = () => { ta.select(); const ok = () => { btn.textContent = 'Copie'; }; const ko = () => { try { document.execCommand('copy'); ok(); } catch (e) { btn.textContent = 'Appui long sur le texte pour copier'; } }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(json).then(ok, ko); else ko(); }; const close = document.createElement('button'); close.textContent = 'Fermer'; close.style.cssText = 'font:16px system-ui;padding:12px 16px;border:1px solid gray;border-radius:10px;background:white;color:black'; close.onclick = () => box.remove(); const pre = document.createElement('pre'); pre.style.cssText = 'white-space:pre-wrap;font:12px monospace;margin-top:12px'; pre.textContent = report.join(String.fromCharCode(10)); box.appendChild(head); box.appendChild(ta); box.appendChild(btn); box.appendChild(close); box.appendChild(pre); })();</script>
+
+<script>
+/* ---------- Données ---------- */
+// [nom, rayon, unité, prix en F par unité, libellé de la pièce]
+const ING = {
+  oignon:['Oignons','fl','kg',450],
+  ail:['Ail','fl','kg',2600],
+  carotte:['Carottes','fl','kg',450],
+  pdt:['Pommes de terre','fl','kg',420],
+  tomate:['Tomates','fl','kg',950],
+  courgette:['Courgettes','fl','kg',750],
+  chou:['Chou','fl','kg',550],
+  poivron:['Poivrons','fl','kg',1300],
+  concombre:['Concombres','fl','kg',650],
+  salade:['Salade','fl','pce',250,'salade'],
+  avocat:['Avocats','fl','pce',220,'avocat'],
+  citron:['Citrons verts','fl','kg',1000],
+  gingembre:['Gingembre','fl','kg',2000],
+  champi:['Champignons','fl','kg',1900],
+  igname:['Igname','fl','kg',400],
+  manioc:['Manioc','fl','kg',380],
+  patate:['Patate douce','fl','kg',420],
+  banane:['Bananes à cuire','fl','kg',320],
+  poulet:['Poulet entier','vp','kg',850],
+  cuisse:['Cuisses de poulet','vp','kg',1150],
+  hache:['Bœuf haché','vp','kg',2300],
+  boeuf:['Bœuf à sauter','vp','kg',3200],
+  saucisse:['Saucisses','vp','kg',1700],
+  cerf:['Cerf','vp','kg',3400],
+  poisson:['Poisson frais (thon, mahi-mahi)','vp','kg',2500],
+  crevette:['Crevettes','vp','kg',3900],
+  jambon:['Jambon','vp','kg',2300],
+  oeuf:['Œufs','cr','pce',55,'œuf'],
+  creme:['Crème fraîche','cr','pce',270,'pot'],
+  fromage:['Fromage râpé','cr','kg',2600],
+  riz:['Riz','ep','kg',340],
+  pates:['Pâtes','ep','kg',500],
+  lentille:['Lentilles','ep','kg',750],
+  pois:['Pois chiches','ep','pce',260,'boîte'],
+  haricot:['Haricots rouges','ep','pce',240,'boîte'],
+  tomconc:['Tomates concassées','ep','pce',310,'boîte'],
+  coco:['Lait de coco','ep','pce',290,'boîte'],
+  mais:['Maïs','ep','pce',240,'boîte'],
+  ptpois:['Petits pois','ep','pce',240,'boîte'],
+  concentre:['Concentré de tomate','ep','pce',200,'boîte'],
+  farine:['Farine','ep','kg',270],
+  huile:['Huile','ep','L',600],
+  soja:['Sauce soja','ep','L',2300],
+  curry:['Curry','ep','pce',350,'sachet']
+};
+const R_ORDER = ['fl','vp','cr','ep'];
+const R_NAME = {fl:'Fruits, légumes et tubercules', vp:'Viandes et poissons', cr:'Crèmerie et œufs', ep:'Épicerie'};
+
+// quantités données pour 4 personnes
+const REC = {
+  bougna:{n:'Bougna à la casserole',e:'🥥',t:60,tag:'Local',prot:'poulet',l:[['cuisse',.9],['igname',.6],['patate',.4],['banane',.4],['coco',2],['oignon',.2]]},
+  poissoncru:{n:'Poisson cru au lait de coco',e:'🐟',t:20,tag:'Local',prot:'poisson',l:[['poisson',.6],['coco',1],['citron',.2],['concombre',.3],['tomate',.3],['oignon',.15],['carotte',.2]]},
+  rougail:{n:'Rougail saucisse',e:'🌶️',t:40,tag:'Local',prot:'porc',l:[['saucisse',.8],['tomate',.5],['oignon',.3],['ail',.02],['gingembre',.02],['riz',.4]]},
+  cerf:{n:'Cerf sauce champignons',e:'🦌',t:50,tag:'Local',prot:'cerf',l:[['cerf',.8],['champi',.25],['creme',1],['oignon',.2],['pdt',.8]]},
+  poissongrille:{n:'Poisson grillé et manioc',e:'🔥',t:35,tag:'Local',prot:'poisson',l:[['poisson',.8],['manioc',.8],['citron',.1],['salade',1],['tomate',.3]]},
+  cantonais:{n:'Riz cantonais',e:'🍚',t:25,tag:'Rapide',prot:'oeuf',l:[['riz',.4],['oeuf',4],['jambon',.2],['ptpois',1],['carotte',.2],['oignon',.15],['soja',.03],['huile',.03]]},
+  pouletcoco:{n:'Poulet coco au curry',e:'🍛',t:45,tag:'Familial',prot:'poulet',l:[['cuisse',1],['coco',1],['curry',.5],['oignon',.3],['riz',.4]]},
+  bolo:{n:'Spaghetti bolognaise',e:'🍝',t:35,tag:'Familial',prot:'boeuf',l:[['pates',.4],['hache',.5],['tomconc',1],['oignon',.2],['carotte',.2],['ail',.02]]},
+  pois:{n:'Curry de pois chiches',e:'🫘',t:30,tag:'Végétarien',prot:'veg',l:[['pois',2],['coco',1],['tomconc',1],['oignon',.25],['curry',.5],['riz',.4]]},
+  gratin:{n:'Gratin de pommes de terre au jambon',e:'🥔',t:55,tag:'Familial',prot:'porc',l:[['pdt',1],['jambon',.2],['creme',1],['fromage',.15]]},
+  crevettes:{n:'Salade de crevettes et avocat',e:'🦐',t:20,tag:'Frais',prot:'crevette',l:[['crevette',.5],['avocat',2],['salade',1],['tomate',.3],['concombre',.3],['citron',.1]]},
+  pouletroti:{n:'Poulet rôti et pommes de terre',e:'🍗',t:70,tag:'Familial',prot:'poulet',l:[['poulet',1.6],['pdt',1],['oignon',.2],['ail',.02],['huile',.02]]},
+  boeufsaute:{n:'Bœuf sauté aux légumes',e:'🥩',t:30,tag:'Rapide',prot:'boeuf',l:[['boeuf',.5],['chou',.3],['carotte',.3],['poivron',.2],['soja',.04],['riz',.4],['huile',.02]]},
+  omelette:{n:'Omelette aux légumes',e:'🍳',t:25,tag:'Rapide',prot:'oeuf',l:[['oeuf',8],['pdt',.6],['oignon',.2],['courgette',.3],['fromage',.1]]},
+  lentilles:{n:'Lentilles aux saucisses',e:'🍲',t:45,tag:'Réconfort',prot:'porc',l:[['lentille',.3],['saucisse',.4],['carotte',.3],['oignon',.2],['pdt',.3]]},
+  chili:{n:'Chili con carne',e:'🥘',t:40,tag:'Familial',prot:'boeuf',l:[['haricot',2],['hache',.4],['tomconc',1],['oignon',.2],['riz',.3],['mais',1]]},
+  pizza:{n:'Pizza maison jambon et fromage',e:'🍕',t:50,tag:'Maison',prot:'porc',l:[['farine',.5],['jambon',.2],['fromage',.2],['concentre',1],['oignon',.1],['huile',.03]]}
+};
+
+/* ---------- État ---------- */
+const KEY = 'menu-caillou-v1';
+let S = {adults:2, kids:2, dinners:5, budget:15000, menu:[], checked:{}, prices:{}, tab:'menu', open:{}};
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
+if (S.people !== undefined){ if (!S.migrated){ S.adults = S.people; S.kids = 0; } delete S.people; }
+S.migrated = true;
+if (!S.stores) S.stores = {};
+if (!S.auto){ S.auto = S.priceInfo ? S.prices : {}; if (S.priceInfo) S.prices = {}; }
+S.menu = (S.menu || []).filter(id => REC[id]);
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+/* ---------- Calculs ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const fmt = n => Math.round(n).toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g, '\u00a0') + '\u00a0F';
+const basePrice = id => (S.auto[id] !== undefined ? S.auto[id] : ING[id][3]);
+const price = id => (S.prices[id] !== undefined ? S.prices[id] : basePrice(id));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const storeOf = id => (S.prices[id] === undefined && S.stores[id]) ? S.stores[id] : '';
+const fmtDate = d => String(d || '').split('-').reverse().join('/');
+const KID = 0.6; // un enfant = 0,6 portion d'adulte
+const heads = () => S.adults + S.kids;
+const portions = () => S.adults + KID * S.kids;
+const recipeLines = rid => REC[rid].l.map(([id, q]) => ({id, q: q * portions() / 4}));
+const recipeCost = rid => recipeLines(rid).reduce((a, x) => a + x.q * price(x.id), 0);
+function shopping(ids){
+  const m = {};
+  ids.forEach(rid => recipeLines(rid).forEach(x => { m[x.id] = (m[x.id] || 0) + x.q; }));
+  const items = Object.entries(m).map(([id, q]) => {
+    const bq = ING[id][2] === 'pce' ? Math.ceil(q - 1e-6) : q;
+    return {id, q: bq, cost: bq * price(id)};
+  });
+  return {items, total: items.reduce((a, x) => a + x.cost, 0)};
+}
+const dec = x => String(Math.round(x * 10) / 10).replace('.', ',');
+function qtyText(id, q, buy){
+  const u = ING[id][2];
+  if (u === 'kg') return q < 1 ? Math.max(10, Math.round(q * 100) * 10) + ' g' : dec(q) + ' kg';
+  if (u === 'L')  return q < 1 ? Math.max(10, Math.round(q * 100) * 10) + ' ml' : dec(q) + ' L';
+  const lab = ING[id][4] || 'pièce';
+  const n = buy ? Math.ceil(q - 1e-6) : q;
+  const s = Number.isInteger(n) ? String(n) : dec(n);
+  return s + ' ' + lab + (n > 1 ? 's' : '');
+}
+const unitLabel = id => { const u = ING[id][2]; return u === 'pce' ? (ING[id][4] || 'pièce') : u; };
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- Composition du menu ---------- */
+function generate(){
+  const all = Object.keys(REC), n = Math.min(S.dinners, all.length);
+  let best = null, bestScore = -1, cheapest = null, cheapT = Infinity;
+  for (let i = 0; i < 400; i++){
+    const ids = shuffle(all).slice(0, n), t = shopping(ids).total;
+    if (t < cheapT){ cheapT = t; cheapest = ids; }
+    if (t <= S.budget){
+      const score = new Set(ids.map(id => REC[id].prot)).size + Math.random() * .9 + (t / S.budget) * .3;
+      if (score > bestScore){ bestScore = score; best = ids; }
+    }
+  }
+  S.menu = best || cheapest;
+  S.open = {};
+}
+function pickToAdd(){
+  const rest = Object.keys(REC).filter(id => !S.menu.includes(id));
+  if (!rest.length) return null;
+  const ok = rest.filter(id => shopping(S.menu.concat(id)).total <= S.budget);
+  if (ok.length) return ok[Math.floor(Math.random() * ok.length)];
+  return rest.map(id => [id, recipeCost(id)]).sort((a, b) => a[1] - b[1])[0][0];
+}
+function setDinners(n){
+  n = Math.max(1, Math.min(7, n));
+  while (S.menu.length > n) S.menu.pop();
+  while (S.menu.length < n){ const id = pickToAdd(); if (!id) break; S.menu.push(id); }
+  S.dinners = S.menu.length;
+}
+function swap(id){
+  const idx = S.menu.indexOf(id); if (idx < 0) return;
+  const rest = Object.keys(REC).filter(r => !S.menu.includes(r));
+  if (!rest.length) return;
+  const trial = r => { const m = S.menu.slice(); m[idx] = r; return shopping(m).total; };
+  const ok = rest.filter(r => trial(r) <= S.budget);
+  const pick = ok.length ? ok[Math.floor(Math.random() * ok.length)] : rest.sort((a, b) => trial(a) - trial(b))[0];
+  S.menu[idx] = pick;
+  delete S.open[id];
+}
+
+/* ---------- Affichage ---------- */
+function renderControls(){
+  $('#v-adults').textContent = S.adults;
+  $('#v-kids').textContent = S.kids;
+  $('#v-dinners').textContent = S.menu.length;
+  const inp = $('#in-budget');
+  if (document.activeElement !== inp) inp.value = S.budget.toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g, ' ');
+}
+function renderGauge(){
+  const {total} = shopping(S.menu), b = S.budget, over = total > b;
+  const pct = b > 0 ? Math.min(100, total / b * 100) : 0;
+  $('#gauge').classList.toggle('over', over);
+  $('#g-total').textContent = fmt(total);
+  const f = $('#g-fill'); f.style.width = pct + '%'; f.classList.toggle('zero', pct <= 0);
+  $('#g-bar').setAttribute('aria-valuenow', Math.round(pct));
+  $('#g-msg').textContent = !S.menu.length ? 'Ajoute des plats pour chiffrer tes courses.'
+    : over ? 'Dépasse le budget de ' + fmt(total - b) + '.'
+    : 'Il reste ' + fmt(b - total) + ' sur ' + fmt(b) + '.';
+  $('#g-per').textContent = S.menu.length ? '≈ ' + fmt(total / (heads() * S.menu.length)) + ' par personne et par dîner' : '';
+}
+function recipeItem(id){
+  const r = REC[id], c = recipeCost(id), open = !!S.open[id];
+  return `<li class="rec">
+    <button type="button" class="rec-head" data-act="toggle" data-id="${id}" aria-expanded="${open}">
+      <span class="ico" aria-hidden="true">${r.e}</span>
+      <span class="rec-main"><span class="rec-name">${r.n}</span><span class="rec-meta"><span class="chip">${r.tag}</span><span>${r.t} min</span></span></span>
+      <span class="rec-price"><strong>${fmt(c)}</strong><small>${fmt(c / heads())} par pers.</small></span>
+    </button>
+    ${open ? `<ul class="lines">${recipeLines(id).map(x => `<li><span>${ING[x.id][0]}</span><span>${qtyText(x.id, x.q, false)}</span><span>${fmt(x.q * price(x.id))}</span></li>`).join('')}</ul>` : ''}
+    <div class="rec-act"><button type="button" class="lnk" data-act="swap" data-id="${id}">Changer</button><button type="button" class="lnk" data-act="del" data-id="${id}">Retirer</button></div>
+  </li>`;
+}
+function renderMenu(){
+  const rest = Object.keys(REC).filter(id => !S.menu.includes(id));
+  $('#panel').innerHTML =
+    `<div class="head"><h2>Menu de la semaine</h2><button type="button" class="btn primary" data-act="new">Nouveau menu</button></div>` +
+    (S.menu.length ? `<ul class="recipes">${S.menu.map(recipeItem).join('')}</ul>` : `<p class="empty">Aucun plat pour l'instant. Ajoute-en un ou compose un nouveau menu.</p>`) +
+    (rest.length ? `<label class="add"><span class="sr">Ajouter un plat</span><select id="add-sel"><option value="">Ajouter un plat…</option>${rest.map(id => `<option value="${id}">${REC[id].n} (${fmt(recipeCost(id))})</option>`).join('')}</select></label>` : '');
+}
+const NOSTORE = 'Enseigne non connue';
+function shopItem(x, showStore){
+  const done = !!S.checked[x.id], st = showStore ? storeOf(x.id) : '';
+  return `<li class="item ${done ? 'done' : ''}"><input type="checkbox" id="ck-${x.id}" data-ck="${x.id}" ${done ? 'checked' : ''}><label class="nm" for="ck-${x.id}">${ING[x.id][0]}${st ? `<small class="st">${esc(st)}</small>` : ''}</label><span class="q">${qtyText(x.id, x.q, true)}</span><span class="c">${fmt(x.cost)}</span></li>`;
+}
+function renderShop(){
+  const {items, total} = shopping(S.menu);
+  if (!items.length){ $('#panel').innerHTML = `<p class="empty">Ta liste est vide. Compose ton menu pour la remplir.</p><button type="button" class="btn primary" data-tab-go="menu">Aller au menu</button>`; return; }
+  const known = items.some(x => storeOf(x.id));
+  const view = known && S.shopView === 'store' ? 'store' : 'rayon';
+  let html = `<div class="head"><h2>Liste de courses</h2><button type="button" class="btn" data-act="uncheck">Tout décocher</button></div>`;
+  if (known) html += `<div class="seg" role="group" aria-label="Affichage de la liste"><button type="button" data-view="rayon" aria-pressed="${view === 'rayon'}">Par rayon</button><button type="button" data-view="store" aria-pressed="${view === 'store'}">Par enseigne</button></div>`;
+  if (view === 'store'){
+    const by = {};
+    items.forEach(x => { const s = storeOf(x.id) || NOSTORE; (by[s] = by[s] || []).push(x); });
+    const sub = n => by[n].reduce((a, x) => a + x.cost, 0);
+    Object.keys(by).sort((a, b) => ((a === NOSTORE) - (b === NOSTORE)) || (sub(b) - sub(a))).forEach(n => {
+      const it = by[n].sort((a, b) => ING[a.id][0].localeCompare(ING[b.id][0], 'fr'));
+      html += `<div class="group"><h3><span>${esc(n)}</span><span class="sub">${fmt(sub(n))}</span></h3><ul class="items">` + it.map(x => shopItem(x, false)).join('') + `</ul></div>`;
+    });
+  } else {
+    R_ORDER.forEach(r => {
+      const it = items.filter(x => ING[x.id][1] === r).sort((a, b) => ING[a.id][0].localeCompare(ING[b.id][0], 'fr'));
+      if (!it.length) return;
+      html += `<div class="group"><h3>${R_NAME[r]}</h3><ul class="items">` + it.map(x => shopItem(x, true)).join('') + `</ul></div>`;
+    });
+  }
+  html += known
+    ? `<p class="info">Chaque article est chiffré à l'enseigne où son prix est le plus bas à Nouméa. Pour tenir ce budget, il faut donc passer dans plusieurs magasins.</p>`
+    : `<p class="info">Pas encore d'enseigne : elle s'affiche avec les prix de prix.nc.</p>`;
+  html += `<div class="foot"><strong>${fmt(total)}</strong><button type="button" class="btn primary" data-act="copy">Copier la liste</button></div>`;
+  $('#panel').innerHTML = html;
+}
+
+function renderPrices(){
+  let html = `<div class="head"><h2>Prix de référence</h2><button type="button" class="btn" data-act="reset-prices">Annuler mes modifications</button></div>`;
+  html += S.priceInfo
+    ? `<p class="info">Prix prix.nc du ${fmtDate(S.priceInfo.date) || 'jour inconnu'} : ${S.priceInfo.n} ingrédients, au plus bas relevé à Nouméa. Les autres restent des estimations. Tes modifications à la main passent avant.</p>`
+    : `<p class="info">Prix de départ : des estimations. Tes modifications à la main sont marquées « modifié ».</p>`;
+  html += `<details class="upd"><summary>Mettre à jour depuis prix.nc</summary>
+    <ol>
+      <li>Ouvre <strong>prix.nc</strong> dans Chrome, dans un onglet à part.</li>
+      <li>Reviens ici et touche « Copier le script ».</li>
+      <li>Retourne sur prix.nc, touche la barre d'adresse, tape <strong>javascript:</strong> à la main, puis colle le script juste derrière (appui long, Coller) et valide. Il faut taper le mot toi-même : Chrome le retire quand il est collé.</li>
+      <li>Un écran blanc montre l'avancement (environ 2 minutes, ne ferme pas la page). À la fin, touche « Copier le résultat ».</li>
+      <li>Reviens ici et touche « Coller et appliquer ».</li>
+    </ol>
+    <div class="btns"><button type="button" class="btn" data-act="copy-script">Copier le script</button><button type="button" class="btn primary" data-act="paste">Coller et appliquer</button></div>
+    <p class="info" style="margin-top:12px">Si « Coller et appliquer » ne marche pas, colle le résultat dans ce cadre :</p>
+    <label class="sr" for="imp">Résultat à importer</label>
+    <textarea id="imp" placeholder="Colle ici le résultat du script"></textarea>
+    <div class="btns"><button type="button" class="btn" data-act="import">Appliquer les prix</button></div>
+  </details>`;
+  R_ORDER.forEach(r => {
+    const ids = Object.keys(ING).filter(id => ING[id][1] === r).sort((a, b) => ING[a][0].localeCompare(ING[b][0], 'fr'));
+    html += `<div class="group"><h3>${R_NAME[r]}</h3>` + ids.map(id => `
+      <div class="prow ${S.prices[id] !== undefined ? 'mod' : ''}" data-row="${id}"><label class="nm" for="pr-${id}">${ING[id][0]}</label>
+      <div class="pin"><input id="pr-${id}" type="text" inputmode="numeric" data-pr="${id}" value="${price(id)}"><span>F / ${unitLabel(id)}</span></div></div>`).join('') + `</div>`;
+  });
+  $('#panel').innerHTML = html;
+}
+function renderPanel(){
+  document.querySelectorAll('.tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === S.tab));
+  if (S.tab === 'menu') renderMenu(); else if (S.tab === 'shop') renderShop(); else renderPrices();
+}
+function renderAll(){ renderControls(); renderGauge(); renderPanel(); save(); }
+
+/* ---------- Actions ---------- */
+let toastT;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1800); }
+function copyList(){
+  const {items} = shopping(S.menu);
+  const line = (x, withStore) => '- ' + ING[x.id][0] + ' : ' + qtyText(x.id, x.q, true) + (withStore && storeOf(x.id) ? ' (' + storeOf(x.id) + ')' : '') + '\n';
+  let t = 'Courses : ' + S.menu.length + ' dîners, ' + S.adults + (S.adults > 1 ? ' adultes' : ' adulte') + (S.kids ? ' et ' + S.kids + (S.kids > 1 ? ' enfants' : ' enfant') : '') + '\n';
+  if (S.shopView === 'store' && items.some(x => storeOf(x.id))){
+    const by = {};
+    items.forEach(x => { const s = storeOf(x.id) || NOSTORE; (by[s] = by[s] || []).push(x); });
+    Object.keys(by).sort((a, b) => (a === NOSTORE) - (b === NOSTORE) || a.localeCompare(b, 'fr')).forEach(n => {
+      t += '\n' + n + '\n';
+      by[n].forEach(x => { t += line(x, false); });
+    });
+  } else {
+    R_ORDER.forEach(r => {
+      const it = items.filter(x => ING[x.id][1] === r); if (!it.length) return;
+      t += '\n' + R_NAME[r] + '\n';
+      it.forEach(x => { t += line(x, true); });
+    });
+  }
+  const fallback = () => { try { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Liste copiée'); } catch (e) { toast('Copie impossible ici'); } };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Liste copiée'), fallback); else fallback();
+}
+function copyText(t, msg){
+  const fallback = () => { try { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast(msg); } catch (e) { toast('Copie impossible ici'); } };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast(msg), fallback); else fallback();
+}
+function appliquerPrix(j){
+  const src = (j && j.prices) || {};
+  const next = {}; let n = 0;
+  Object.keys(src).forEach(id => {
+    if (!ING[id]) return;
+    const v = Math.round(Number(src[id]));
+    if (v > 0){ next[id] = v; n++; }
+  });
+  if (!n) return 0;
+  S.auto = next;
+  const st = {};
+  if (j && j.stores) Object.keys(j.stores).forEach(id => { if (ING[id] && j.stores[id]) st[id] = String(j.stores[id]).slice(0, 60); });
+  S.stores = st;
+  S.priceInfo = {date: (j && j.date) || '', n: n};
+  return n;
+}
+function importPrices(text){
+  let j;
+  try { j = JSON.parse(String(text).trim()); } catch (e) { toast('Texte illisible : colle le résultat complet'); return; }
+  const n = appliquerPrix(j && j.prices ? j : {prices: j});
+  if (!n){ toast('Aucun prix reconnu'); return; }
+  toast(n + ' prix mis à jour');
+  renderAll();
+}
+async function chargerPrixAuto(){
+  try {
+    const r = await fetch('prix.json?t=' + Date.now(), {cache: 'no-store'});
+    if (!r.ok) return;
+    const j = await r.json();
+    if (appliquerPrix(j)) renderAll();
+  } catch (e) { /* hors ligne, ou page sans prix.json : on garde les prix connus */ }
+}
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+document.addEventListener('click', e => {
+  const vw = e.target.closest('[data-view]');
+  if (vw){ S.shopView = vw.dataset.view; renderAll(); return; }
+  const goto = e.target.closest('[data-tab-go]');
+  if (goto){ S.tab = goto.dataset.tabGo; renderAll(); return; }
+  const tab = e.target.closest('[data-tab]');
+  if (tab){ S.tab = tab.dataset.tab; renderAll(); return; }
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const id = el.dataset.id;
+  switch (el.dataset.act){
+    case 'adults-': S.adults = clamp(S.adults - 1, 1, 10); break;
+    case 'adults+': S.adults = clamp(S.adults + 1, 1, 10); break;
+    case 'kids-': S.kids = clamp(S.kids - 1, 0, 10); break;
+    case 'kids+': S.kids = clamp(S.kids + 1, 0, 10); break;
+    case 'dinners-': setDinners(S.menu.length - 1); break;
+    case 'dinners+': setDinners(S.menu.length + 1); break;
+    case 'budget-': S.budget = clamp(Math.round(S.budget / 1000) * 1000 - 1000, 1000, 500000); break;
+    case 'budget+': S.budget = clamp(Math.round(S.budget / 1000) * 1000 + 1000, 1000, 500000); break;
+    case 'new': generate(); break;
+    case 'swap': swap(id); break;
+    case 'del': S.menu = S.menu.filter(x => x !== id); delete S.open[id]; S.dinners = S.menu.length; break;
+    case 'toggle': S.open[id] = !S.open[id]; break;
+    case 'uncheck': S.checked = {}; break;
+    case 'copy': copyList(); return;
+    case 'reset-prices': S.prices = {}; break;
+    case 'copy-script': copyText($('#ps-src').textContent.trim(), 'Script copié'); return;
+    case 'import': importPrices(($('#imp') || {}).value || ''); return;
+    case 'paste':
+      if (navigator.clipboard && navigator.clipboard.readText) navigator.clipboard.readText().then(t => importPrices(t), () => toast('Accès refusé : colle le résultat dans le cadre'));
+      else toast('Colle le résultat dans le cadre');
+      return;
+  }
+  renderAll();
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'add-sel' && e.target.value){ S.menu.push(e.target.value); S.dinners = S.menu.length; renderAll(); return; }
+  if (e.target.dataset && e.target.dataset.ck){ S.checked[e.target.dataset.ck] = e.target.checked; renderShop(); save(); }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'in-budget'){
+    const v = parseInt(e.target.value.replace(/\D/g, ''), 10);
+    if (!isNaN(v)){ S.budget = clamp(v, 1, 5000000); renderGauge(); save(); }
+  } else if (e.target.dataset && e.target.dataset.pr){
+    const id = e.target.dataset.pr, v = parseInt(e.target.value.replace(/\D/g, ''), 10);
+    if (isNaN(v)) return;
+    if (v === basePrice(id)) delete S.prices[id]; else S.prices[id] = v;
+    const row = e.target.closest('.prow'); if (row) row.classList.toggle('mod', S.prices[id] !== undefined);
+    renderGauge(); save();
+  }
+});
+$('#in-budget').addEventListener('blur', () => { S.budget = clamp(S.budget, 1000, 5000000); renderAll(); });
+$('#in-budget').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+
+/* ---------- Démarrage ---------- */
+if (!S.menu.length) generate();
+S.dinners = S.menu.length;
+renderAll();
+chargerPrixAuto();
+</script>
+</body>
+</html>

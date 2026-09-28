@@ -1,0 +1,31 @@
+name: Mise à jour des prix
+
+on:
+  schedule:
+    # dimanche 18h UTC = lundi 5h du matin à Nouméa
+    - cron: '0 18 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  maj:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Relever les prix sur prix.nc
+        env:
+          PRIXNC_SORTIE: prix.json
+          PRIXNC_FUSION: '1'
+          PRIXNC_MIN: '25'
+        run: python maj_prix.py
+      - name: Enregistrer les nouveaux prix
+        run: |
+          git config user.name "prix-bot"
+          git config user.email "prix-bot@users.noreply.github.com"
+          git add prix.json rapport.txt
+          git diff --cached --quiet || (git commit -m "Prix du $(date +%F)" && git push)
