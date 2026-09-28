@@ -156,13 +156,17 @@ details.upd .btns{display:flex;gap:8px;flex-wrap:wrap;}
 .how b{font-weight:600;}
 .how-link{display:block;font-size:14px;padding:2px 0 8px;color:var(--teal);font-weight:600;}
 .rec-meta .mats{letter-spacing:2px;}
+.share{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:22px;}
+.share img{flex:0 0 auto;width:112px;height:112px;border-radius:8px;background:#fff;image-rendering:pixelated;}
+.share strong{font-family:var(--display);font-size:17px;color:var(--ink);}
+.share p{margin:4px 0 10px;font-size:14px;color:var(--muted);}
 .install{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;background:var(--pale);border-radius:14px;padding:10px 12px;margin-top:14px;font-size:14px;}
 .install[hidden]{display:none;}
 .install span{flex:1 1 220px;}
 details.about{margin-top:6px;}
 details.about summary{cursor:pointer;font-weight:600;color:var(--ink);min-height:28px;}
 details.about a{color:var(--teal);}
-.note{margin-top:22px;font-size:13px;color:var(--muted);}
+.note{margin-top:14px;font-size:13px;color:var(--muted);background:var(--veil-top);border-radius:14px;padding:12px 14px;}
 .note p{margin:0 0 8px;}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;}
 .toast.show{opacity:1;transform:translate(-50%,0);}
@@ -245,6 +249,15 @@ details.about a{color:var(--teal);}
   </nav>
 
   <section id="panel" role="tabpanel"></section>
+
+  <section class="share" aria-label="Partager l'appli">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAR8AAAEfCAAAAABdPJ2RAAADNElEQVR42u3dQW7jMAwFUKvo/a+sLroqEMifkpy29uNyGmeCBxI0Fclp/RCD+EDAhw8fPnz48OEj+PDhw4cPHz58+Ag+fPjw4cOHDx/Bhw8fPnz48OHDR/Dhw4cPHz63iM/8pa363v388pcv6fEFez6Z/FFffPjw4fPg/p73xryVt/g9+3WfTP6oLz58+PDR3/MePntBi1cB+pZPJn/UFx8+fPjo77N3Ai9X3fN23eWP+uLDh4/g84f6+zGYp1s8hwd3AvJHffHhw4ePWOzvvfrK8v66YO9dX/tk8ocPHz58+Ojvx6BPBxeM1uf3LMw3+aO++PDhw0d898S3rXTnA/ji/jr5o7748OHDR3+fHY/LW9fz6brvHOO7/FFffPjw4aO/x30zaNAtbvN5Ry/P/YvdXv7w4cOHD5+b9/fjvN8GtwB7nlg3utz+OvXFhw8fPo+P6f11/by1jubpXh3/y0v/e7q9/OHDhw8fPjfv7+18AA/+MRjOg1Y++7TactOXP3z48OHD5z/Gpv3z+VfmwVC/+EX/Ea8lyB/1xYcPHz76ez6xt+pYXR7cL+zo8ocPHz58+Pz/mP592LyHzx6My28B8vUC6/Pqiw8fPnz096AXt2oTznfi5esF+SKC83Hqiw8fPnweEfXz7/m58sXz6OU9+Uf1b/JHffHhw4eP+T0YzoNxPJ/7Rzvmgy/680388kd98eHDh4/5/YpTb3verDycyx8+fPjw4aO/59P17HG3Y+ebWZ9XX3z48OGjv1/5Xwz6bT6/7/n5Ofmjvvjw4cPnETF9Pq48hwddO3gwbflRtIuPqZU/fPjw4cPn5v09H4gXfwo2n99HH2nxV2blDx8+fPjweVR/D3pxfkPwcn4PRvXgRiI/Ny9/1BcfPnz46O97bghaPJyXn33z829N/qgvPnz48NHfr4vyPrnR5cFawlFdS5A/6osPHz589PfFc3Wjd5ndMb/n1+flj/riw4cPnyf299kF7/xBcr3a5vMD8+Z39cWHDx8+j4g3nH+XP3z4CD58+PDhw4cPH8GHDx8+fPjw4cNH8OHDhw8fPnz48BF8+PDhw4cPHz6CDx8+fH49vgCCzrpPfpeqcgAAAABJRU5ErkJggg==" alt="QR code pour ouvrir Menu Caillou" width="112" height="112">
+    <div>
+      <strong>Fais-la essayer</strong>
+      <p>Envoie le lien ou fais scanner ce QR code. Sur Android comme sur iPhone, l'appli s'installe depuis le navigateur.</p>
+      <button type="button" class="btn primary" data-act="share">Envoyer le lien</button>
+    </div>
+  </section>
 
   <footer class="note">
     <p>Les prix de départ sont des estimations, à remplacer par les relevés officiels de prix.nc (onglet Prix). Après une mise à jour, chaque prix est le plus bas relevé à Nouméa : tes courses peuvent donc coûter un peu plus cher. Les plats sont chiffrés au prorata des quantités ; la liste de courses arrondit les boîtes et les pièces à l'unité. Un enfant compte pour 0,6 portion d'adulte.</p>
@@ -696,6 +709,14 @@ async function chargerPrixAuto(){
     if (appliquerPrix(j)) renderAll();
   } catch (e) { /* hors ligne, ou page sans prix.json : on garde les prix connus */ }
 }
+const SHARE_URL = 'https://blrobical-svg.github.io/Menu-du-cailloux/';
+const SHARE_TXT = "Menu Caillou : les menus et la liste de courses de la semaine, chiffrés en francs avec les prix de prix.nc. Ouvre le lien puis « Ajouter à l'écran d'accueil » pour l'installer.";
+async function partager(){
+  try {
+    if (navigator.share){ await navigator.share({title: 'Menu Caillou', text: SHARE_TXT, url: SHARE_URL}); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  copyText(SHARE_TXT + '\n' + SHARE_URL, 'Lien copié : colle-le dans un message');
+}
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 document.addEventListener('click', e => {
@@ -731,6 +752,7 @@ document.addEventListener('click', e => {
     case 'uncheck': S.checked = {}; break;
     case 'copy': copyList(); return;
     case 'reset-prices': S.prices = {}; break;
+    case 'share': partager(); return;
     case 'copy-script': copyText($('#ps-src').textContent.trim(), 'Script copié'); return;
     case 'import': importPrices(($('#imp') || {}).value || ''); return;
     case 'paste':
