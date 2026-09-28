@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu Caillou : réparation</title>
+<style>
+body{margin:0;padding:20px;font:16px/1.5 system-ui,sans-serif;background:#F2F6F5;color:#0B2B33;}
+main{max-width:560px;margin:0 auto;}
+h1{font-size:24px;margin:0 0 6px;}
+p{margin:0 0 14px;color:#4F6B70;}
+button{display:block;width:100%;margin:10px 0;padding:14px;border:0;border-radius:12px;font:600 17px system-ui,sans-serif;background:#0E7C86;color:#fff;}
+button.sec{background:#fff;color:#0B2B33;border:1px solid #C9DAD7;}
+pre{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid #C9DAD7;border-radius:12px;padding:12px;font:13px/1.5 ui-monospace,Menlo,monospace;}
+</style>
+</head>
+<body>
+<main>
+  <h1>Menu Caillou : réparation</h1>
+  <p>Si l'appli reste blanche ou ne démarre pas, touche « Réparer ». Cela efface les données gardées sur cet appareil (réglages, menu, mémoire hors ligne) et recharge l'appli.</p>
+  <button type="button" id="rep">Réparer et ouvrir l'appli</button>
+  <button type="button" class="sec" id="cop">Copier le diagnostic</button>
+  <pre id="diag">Analyse en cours…</pre>
+</main>
+<script>
+(function(){
+  var out=document.getElementById('diag'), lignes=[];
+  function ligne(t){lignes.push(t);out.textContent=lignes.join('\n');}
+  ligne('Adresse : '+location.href);
+  ligne('Navigateur : '+navigator.userAgent);
+  ligne('En ligne : '+(navigator.onLine?'oui':'non'));
+  var base=location.href.replace(/reparer\.html.*$/,'');
+  fetch(base+'index.html?d='+Date.now(),{cache:'no-store'}).then(function(r){
+    ligne('index.html : statut '+r.status);
+    return r.text();
+  }).then(function(t){
+    ligne('index.html : '+t.length+' caractères');
+    ligne('  se termine par </html> : '+(/<\/html>\s*$/.test(t)?'oui':'NON (fichier tronqué ?)'));
+    ligne('  balises style (ouvertes / fermées) : '+(t.split('<style').length-1)+' / '+(t.split('</style>').length-1));
+    ligne('  balises script (ouvertes / fermées) : '+(t.split('<script').length-1)+' / '+(t.split('<\/script>').length-1));
+    ligne('  écran bêta présent : '+(t.indexOf('id="beta"')>=0?'oui':'non'));
+    ligne('  polices Google : '+(t.indexOf('fonts.googleapis')>=0?'oui (ancienne version)':'non'));
+  }).catch(function(e){ligne('index.html : erreur '+e);}).then(function(){
+    try{ligne('Données enregistrées : '+(localStorage.getItem('menu-caillou-v1')?localStorage.getItem('menu-caillou-v1').length+' caractères':'aucune'));}catch(e){ligne('Données enregistrées : illisibles ('+e+')');}
+    if(navigator.serviceWorker){
+      return navigator.serviceWorker.getRegistrations().then(function(rs){ligne('Mémoire hors ligne (service worker) : '+rs.length+' active(s)');});
+    }else ligne('Service worker : non pris en charge');
+  }).then(function(){
+    if(window.caches)return caches.keys().then(function(k){ligne('Caches : '+(k.join(', ')||'aucun'));});
+  }).then(function(){
+    return fetch(base+'prix.json?d='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+      ligne('prix.json : '+Object.keys(j.prices||{}).length+' prix, '+Object.keys(j.stores||{}).length+' enseignes, date '+(j.date||'?'));
+    }).catch(function(){ligne('prix.json : illisible');});
+  });
+  document.getElementById('cop').onclick=function(){
+    var t=lignes.join('\n');
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){document.getElementById('cop').textContent='Copié';});
+  };
+  document.getElementById('rep').onclick=function(){
+    var fin=function(){try{sessionStorage.clear();}catch(e){}location.replace(base+'?r='+Date.now());};
+    try{localStorage.removeItem('menu-caillou-v1');}catch(e){}
+    var p=[];
+    try{if(navigator.serviceWorker)p.push(navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister();}));}));}catch(e){}
+    try{if(window.caches)p.push(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k);}));}));}catch(e){}
+    Promise.all(p).then(fin,fin);
+  };
+})();
+</script>
+</body>
+</html>
