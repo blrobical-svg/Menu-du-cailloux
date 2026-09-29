@@ -672,7 +672,11 @@ const fmt = n => Math.round(n).toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g
 const basePrice = id => (S.auto[id] !== undefined ? S.auto[id] : ING[id][3]);
 const price = id => (S.prices[id] !== undefined ? S.prices[id] : basePrice(id));
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const storeOf = id => (S.prices[id] === undefined && S.stores[id]) ? S.stores[id] : '';
+const storeOf = id => {
+  if (S.prices[id] !== undefined) return '';
+  if (S.stores[id]) return S.stores[id];
+  return (ING[id] && ING[id][1] === 'surg') ? 'Thiriet' : '';
+};
 const fmtDate = d => String(d || '').split('-').reverse().join('/');
 const KID = 0.6; // un enfant = 0,6 portion d'adulte
 const heads = () => S.adults + S.kids;
