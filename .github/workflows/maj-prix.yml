@@ -2,7 +2,6 @@ name: Mise à jour des prix
 
 on:
   schedule:
-    # tous les jours à 16h UTC = 3h du matin à Nouméa
     - cron: '0 16 * * *'
   workflow_dispatch:
 
