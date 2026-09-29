@@ -61,6 +61,7 @@ R = {
     'cerf': (['cerf'], 'kg', r'cerf', r'pate|saucisson|conserve|terrine|rillette|fume|seche|chien|nourriture|croquette|biscuit|bonbon', None),
     'poisson': (['thon','mahi','wahoo','marlin','poisson frais'], 'kg', r'thon|mahi|wahoo|marlin|poisson', r'boite|conserve|surgel|pane|baton|fume|huile|sauce|sardine|maquereau|chat|chien|litiere|salade|rillette|pate|croquette|nugget|plat|riz|pizza|sandwich|tartinable|bouillon|soupe', None),
     'crevette': (['crevette'], 'kg', r'crevette', r'chips|cracker|nem|beignet|sauce|soupe|salade|plat|riz|nouille|bouillon|cocktail|conserve|boite|bocal|pate|sushi|rouleau|arome|pizza|croquette|chien|chat|epice|assaison', None),
+    'moule': (['moules'], 'kg', r'\bmoules?\b', r'a gateau|a muffin|a tarte|a cake|a glacon|silicone|patisserie|four|cuisson|bougie|savon|moulinex|moulin(?!s)|congelation|bac|conserve|boite|bocal|surgele|plat|sauce toute|bisque|soupe|pate|rillette|mariniere', None),
     'jambon': (['jambon'], 'kg', r'jambon', r'cru|sec|pizza|sandwich|quiche|croque|salade|chien|puree|pate|mousse|beurre|fromage|feuillet|nouille|tartinable|plat|omelette|gratin|lardon', None),
     'oeuf': (['oeuf','oeufs frais'], 'pce', r'\boeufs?\b', r'chocolat|paques|kinder|plat|mayonn|nouille|pate|poudre|lait|cocotte|dur|coque|colorant|gaufre|crepe|biscuit|tapioca|jaune|blanc|liquide|surprise|cadeau|jouet|decor|teinture|ballon|gel|shampo|creme|omelette|salade|sandwich|pain', None),
     'creme': (['creme fraiche','creme'], 'pce', r'creme.*fraiche|fraiche.*creme', r'soin|jour|nuit|main|visage|corps|solaire|glace|dessert|chocolat|vanille|patissiere|vegetal|soja|anti|depil|rasage|bebe|hydra|pommade|douche|chantilly', 0.2),
@@ -91,6 +92,20 @@ def norm(s):
 def nom_enseigne(s):
     s = re.sub(r'\s+', ' ', str(s or '')).strip()
     return re.sub(r'[^\W\d_]+', lambda m: m.group(0).capitalize(), s)
+
+
+# Enseignes qui ne sont pas des magasins d'alimentation : leurs relevés sont ignorés.
+# Pour en ajouter une, ajoute son nom (majuscules ou minuscules, peu importe) dans cette liste.
+# Motifs (mot entier, insensible aux accents/majuscules) des enseignes à ignorer
+# car elles ne vendent pas au grand public. Pour en ajouter une, ajoute son motif ici.
+MAGASINS_EXCLUS = [
+    r'\bcheval\b',  # Cheval Distribution : grossiste, pas de vente au public
+]
+
+
+def magasin_exclu(nom):
+    n = norm(nom)
+    return any(re.search(m, n) for m in MAGASINS_EXCLUS)
 
 
 class Refus(Exception):
@@ -138,6 +153,8 @@ def enseigne_moins_chere(id_produit, vus):
         for r in (j.get('_embedded') or {}).get('relevesprix') or []:
             vus[str(r.get('idCommune'))] += 1
             if str(r.get('idCommune')) != COMMUNE_RELEVES:
+                continue
+            if magasin_exclu(r.get('magasin')):
                 continue
             d = r.get('dateReleve')
             if isinstance(d, (int, float)) and maintenant - d > AGE_MAX_MS:
