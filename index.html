@@ -836,7 +836,9 @@ function generateMeal(meal, ceiling){
 }
 function pickToAdd(meal){
   const budgetDispo = Math.max(0, S.budget - autresRepasTotal(meal));
-  const rest = dispoFor(meal).filter(id => !S.menus[meal].includes(id));
+  const tous = dispoFor(meal);
+  let rest = tous.filter(id => !S.menus[meal].includes(id));
+  if (!rest.length) rest = tous;  // plus de plat inédit : on autorise à repiocher un plat déjà choisi
   if (!rest.length) return null;
   const ok = rest.filter(id => shopping(S.menus[meal].concat(id)).total <= budgetDispo);
   if (ok.length) return ok[Math.floor(Math.random() * ok.length)];
@@ -861,16 +863,17 @@ function ajusterMenu(){
   if (mauvaisTotal) S.open = {};
   return mauvaisTotal;
 }
-function swap(id){
-  const meal = REC[id].meal, idx = S.menus[meal].indexOf(id); if (idx < 0) return;
+function swapAt(meal, idx){
+  if (!S.menus[meal] || idx < 0 || idx >= S.menus[meal].length) return;
+  const courant = S.menus[meal][idx];
   const budgetDispo = Math.max(0, S.budget - autresRepasTotal(meal));
-  const rest = dispoFor(meal).filter(r => !S.menus[meal].includes(r));
+  const rest = dispoFor(meal).filter(r => r !== courant);
   if (!rest.length) return;
   const trial = r => { const m = S.menus[meal].slice(); m[idx] = r; return shopping(m).total; };
   const ok = rest.filter(r => trial(r) <= budgetDispo);
   const pick = ok.length ? ok[Math.floor(Math.random() * ok.length)] : rest.sort((a, b) => trial(a) - trial(b))[0];
   S.menus[meal][idx] = pick;
-  delete S.open[id];
+  S.open = {};
 }
 
 /* ---------- Affichage ---------- */
@@ -895,8 +898,8 @@ function renderGauge(){
     : 'Il reste ' + fmt(b - total) + ' sur ' + fmt(b) + '.';
   $('#g-per').textContent = nbRepas ? '≈ ' + fmt(total / heads()) + ' par personne pour la semaine' : '';
 }
-function recipeItem(id){
-  const r = REC[id], c = recipeCost(id), open = !!S.open[id];
+function recipeItem(id, meal, idx){
+  const r = REC[id], c = recipeCost(id), cle = meal + ':' + idx, open = !!S.open[cle];
   const mine = EQ_ORDER.filter(e => r.how[e] && S.eq.includes(e));
   const mats = r.how.any ? '🥗 sans cuisson' : mine.map(e => EQ[e][1]).join(' ');
   let detail = '';
@@ -909,22 +912,22 @@ function recipeItem(id){
       `<a class="how-link" href="https://www.google.com/search?q=${q}" target="_blank" rel="noopener">Chercher une recette détaillée</a>`;
   }
   return `<li class="rec">
-    <button type="button" class="rec-head" data-act="toggle" data-id="${id}" aria-expanded="${open}">
+    <button type="button" class="rec-head" data-act="toggle" data-meal="${meal}" data-idx="${idx}" aria-expanded="${open}">
       <span class="ico" aria-hidden="true">${r.e}</span>
       <span class="rec-main"><span class="rec-name">${r.n}</span><span class="rec-meta"><span class="chip">${r.tag}</span><span>${r.t} min</span><span class="mats" aria-label="Matériel">${mats}</span></span></span>
       <span class="rec-price"><strong>${fmt(c)}</strong><small>${fmt(c / heads())} par pers.</small></span>
     </button>
     ${detail}
-    <div class="rec-act"><button type="button" class="lnk" data-act="swap" data-id="${id}">Changer</button><button type="button" class="lnk" data-act="del" data-id="${id}">Retirer</button></div>
+    <div class="rec-act"><button type="button" class="lnk" data-act="swap" data-meal="${meal}" data-idx="${idx}">Changer</button><button type="button" class="lnk" data-act="del" data-meal="${meal}" data-idx="${idx}">Retirer</button></div>
   </li>`;
 }
 function renderMenu(){
   $('#panel').innerHTML = MEAL_ORDER.map(meal => {
-    const menu = S.menus[meal], rest = dispoFor(meal).filter(id => !menu.includes(id));
+    const menu = S.menus[meal], rest = dispoFor(meal);
     return `<section class="meal-block">
       <div class="head"><h2>${MEAL_NOM[meal]}</h2><button type="button" class="btn primary" data-act="new" data-meal="${meal}">Nouveau menu</button></div>` +
-      (menu.length ? `<ul class="recipes">${menu.map(recipeItem).join('')}</ul>` : `<p class="empty">Aucun plat pour l'instant. Ajoute-en un ou compose un nouveau menu.</p>`) +
-      (rest.length ? `<label class="add"><span class="sr">Ajouter un plat (${MEAL_NOM[meal]})</span><select data-meal="${meal}" class="add-sel"><option value="">Ajouter un plat…</option>${rest.map(id => `<option value="${id}">${REC[id].n} (${fmt(recipeCost(id))})</option>`).join('')}</select></label>` : '') +
+      (menu.length ? `<ul class="recipes">${menu.map((id, idx) => recipeItem(id, meal, idx)).join('')}</ul>` : `<p class="empty">Aucun plat pour l'instant. Ajoute-en un ou compose un nouveau menu.</p>`) +
+      (rest.length ? `<label class="add"><span class="sr">Ajouter un plat (${MEAL_NOM[meal]})</span><select data-meal="${meal}" class="add-sel"><option value="">Ajouter un plat…</option>${rest.map(id => `<option value="${id}">${REC[id].n}${menu.includes(id) ? ' — déjà au menu' : ''} (${fmt(recipeCost(id))})</option>`).join('')}</select></label>` : '') +
       `</section>`;
   }).join('');
 }
@@ -1114,9 +1117,9 @@ document.addEventListener('click', e => {
     case 'budget-': S.budget = clamp(Math.round(S.budget / 1000) * 1000 - 1000, 1000, 500000); break;
     case 'budget+': S.budget = clamp(Math.round(S.budget / 1000) * 1000 + 1000, 1000, 500000); break;
     case 'new': generateMeal(meal); break;
-    case 'swap': swap(id); break;
-    case 'del': { const m = REC[id].meal; S.menus[m] = S.menus[m].filter(x => x !== id); delete S.open[id]; S.counts[m] = S.menus[m].length; break; }
-    case 'toggle': S.open[id] = !S.open[id]; break;
+    case 'swap': swapAt(meal, parseInt(el.dataset.idx, 10)); break;
+    case 'del': { const i = parseInt(el.dataset.idx, 10); S.menus[meal].splice(i, 1); S.counts[meal] = S.menus[meal].length; S.open = {}; break; }
+    case 'toggle': { const cle = meal + ':' + el.dataset.idx; S.open[cle] = !S.open[cle]; break; }
     case 'uncheck': S.checked = {}; break;
     case 'copy': copyList(); return;
     case 'reset-prices': S.prices = {}; break;
