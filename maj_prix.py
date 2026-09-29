@@ -62,6 +62,15 @@ R = {
     'poisson': (['thon','mahi','wahoo','marlin','poisson frais'], 'kg', r'thon|mahi|wahoo|marlin|poisson', r'boite|conserve|surgel|pane|baton|fume|huile|sauce|sardine|maquereau|chat|chien|litiere|salade|rillette|pate|croquette|nugget|plat|riz|pizza|sandwich|tartinable|bouillon|soupe', None),
     'crevette': (['crevette'], 'kg', r'crevette', r'chips|cracker|nem|beignet|sauce|soupe|salade|plat|riz|nouille|bouillon|cocktail|conserve|boite|bocal|pate|sushi|rouleau|arome|pizza|croquette|chien|chat|epice|assaison', None),
     'moule': (['moules'], 'kg', r'\bmoules?\b', r'a gateau|a muffin|a tarte|a cake|a glacon|silicone|patisserie|four|cuisson|bougie|savon|moulinex|moulin(?!s)|congelation|bac|conserve|boite|bocal|surgele|plat|sauce toute|bisque|soupe|pate|rillette|mariniere', None),
+    'pain': (['pain de mie', 'baguette'], 'pce', r'pain|baguette', r'perdu|epice|surgele|viennois(?!erie)|chien|chat|savon|niche|escalope|chapelure|farine|bebe|infantile|tambour|magique|electrique|sauce|epaule', 1),
+    'beurre': (['beurre'], 'pce', r'beurre', r'cacahuete|karite|corps|cacao|visage|solaire|epice|sauce|biscuit|cookie|gateau|patisserie|chien|chat|massage', 0.25),
+    'confiture': (['confiture'], 'pce', r'confiture', r'lait concentre|de canard|oignon(?!s? confit)', 1),
+    'cafe': (['cafe moulu', 'cafe soluble'], 'pce', r'\bcafe\b', r'creme|glace|liqueur|biere|bonbon|chocolat|the |infusion|gateau|creme dessert|yaourt|capsule compatible', 1),
+    'lait': (['lait demi ecreme', 'lait entier'], 'L', r'\blait\b', r'coco|amande|soja|avoine|riz|concentre|chocolat|fraise|\bcreme\b|beurre|poudre|bebe|infantile|corps|visage|demaquillant|solaire|savon|cheveux', None),
+    'cereales': (['cereales petit dejeuner'], 'pce', r'cereale', r'barre|biscuit|bebe|infantile|chien|chat|liqueur|whisky', 1),
+    'thonconserve': (['thon boite'], 'pce', r'thon', r'frais|surgele|steak|pave|tartare|sushi|chat|croquette|filet.*frais', 1),
+    'mayonnaise': (['mayonnaise'], 'pce', r'mayonnaise', r'light.*sauce.*salade|allegee.*sauce', 1),
+    'yaourt': (['yaourt nature'], 'pce', r'yaourt', r'glace|boisson lactee(?!.*yaourt)|creme dessert|masque|soin|cheveux', 4),
     'jambon': (['jambon'], 'kg', r'jambon', r'cru|sec|pizza|sandwich|quiche|croque|salade|chien|puree|pate|mousse|beurre|fromage|feuillet|nouille|tartinable|plat|omelette|gratin|lardon', None),
     'oeuf': (['oeuf','oeufs frais'], 'pce', r'\boeufs?\b', r'chocolat|paques|kinder|plat|mayonn|nouille|pate|poudre|lait|cocotte|dur|coque|colorant|gaufre|crepe|biscuit|tapioca|jaune|blanc|liquide|surprise|cadeau|jouet|decor|teinture|ballon|gel|shampo|creme|omelette|salade|sandwich|pain', None),
     'creme': (['creme fraiche','creme'], 'pce', r'creme.*fraiche|fraiche.*creme', r'soin|jour|nuit|main|visage|corps|solaire|glace|dessert|chocolat|vanille|patissiere|vegetal|soja|anti|depil|rasage|bebe|hydra|pommade|douche|chantilly', 0.2),
@@ -172,6 +181,32 @@ def enseigne_moins_chere(id_produit, vus):
     return promo
 
 
+def coords_magasin(id_magasin, cache):
+    """Latitude/longitude d'un magasin (mises en cache : un magasin peut revenir pour plusieurs ingrédients)."""
+    if not id_magasin:
+        return None
+    if id_magasin in cache:
+        return cache[id_magasin]
+    coords = None
+    try:
+        j = appel('%s/api/v1/magasins/%s' % (BASE, urllib.parse.quote(str(id_magasin))))
+        time.sleep(PAUSE)
+        for cle_lat, cle_lon in (('latitude', 'longitude'), ('lat', 'lon'), ('lat', 'lng')):
+            try:
+                lat, lon = float(j.get(cle_lat)), float(j.get(cle_lon))
+                if lat and lon:
+                    coords = {'lat': round(lat, 5), 'lon': round(lon, 5)}
+                    break
+            except (TypeError, ValueError):
+                continue
+    except Refus:
+        raise
+    except Exception:
+        coords = None
+    cache[id_magasin] = coords
+    return coords
+
+
 def genre_unite(p):
     u = norm(p.get('uniteLabelCourt') or p.get('uniteLabel') or '')
     if u == 'kg':
@@ -208,7 +243,7 @@ def copier(texte):
 def main():
     print('Menu Caillou : relevé des prix sur prix.nc (Nouméa)')
     print('Compte 2 à 3 minutes. Ne ferme pas cette fenêtre.\n')
-    prix, rapport, enseignes, communes_vues = {}, [], {}, Counter()
+    prix, rapport, enseignes, communes_vues, magasins, cache_coords = {}, [], {}, Counter(), {}, {}
     ids = list(R)
     try:
         for i, ident in enumerate(ids, 1):
@@ -266,6 +301,10 @@ def main():
             if r:
                 val = float(r['prixParUnite']) * ref[3]
                 enseigne = nom_enseigne(r.get('magasin'))
+                if enseigne and enseigne not in magasins:
+                    c = coords_magasin(r.get('idMagasin'), cache_coords)
+                    if c:
+                        magasins[enseigne] = c
             prix[ident] = int(round(val))
             if enseigne:
                 enseignes[ident] = enseigne
@@ -298,7 +337,10 @@ def main():
         fusion = dict(ancien.get('prices') or {})
         fusion.update(prix)
         prix = fusion
-    resultat = {'source': 'prix.nc', 'commune': 'Noumea', 'date': date.today().isoformat(), 'prices': prix, 'stores': enseignes}
+        magasins_fusion = dict(ancien.get('magasins') or {})
+        magasins_fusion.update(magasins)
+        magasins = magasins_fusion
+    resultat = {'source': 'prix.nc', 'commune': 'Noumea', 'date': date.today().isoformat(), 'prices': prix, 'stores': enseignes, 'magasins': magasins}
     texte = json.dumps(resultat, separators=(',', ':'))
     with open(chemin, 'w', encoding='utf-8') as f:
         f.write(texte)
@@ -306,7 +348,7 @@ def main():
         f.write('\n'.join(rapport) + '\n')
         f.write('\nCodes de commune vus dans les relevés : %s\n' % dict(communes_vues.most_common(8)))
 
-    print('\n%d prix trouvés sur %d ingrédients, dont %d avec leur enseigne.' % (len(prix), len(ids), len(enseignes)))
+    print('\n%d prix trouvés sur %d ingrédients, dont %d avec leur enseigne et %d avec ses coordonnées.' % (len(prix), len(ids), len(enseignes), len(magasins)))
     if not enseignes:
         print('ATTENTION : aucune enseigne de Nouméa identifiée (voir la fin de rapport.txt).')
     print('Détail des produits retenus : rapport.txt (dans le même dossier).\n')

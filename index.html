@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Menu Caillou</title>
-<meta name="description" content="Menus de la semaine et liste de courses chiffrés en francs pacifique, avec les prix de prix.nc.">
+<meta name="description" content="Petits-déjeuners, déjeuners et dîners de la semaine, et liste de courses chiffrés en francs pacifique, avec les prix de prix.nc.">
 <meta name="theme-color" content="#0E7C86">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -147,6 +147,9 @@ button{font:inherit;color:inherit;cursor:pointer;}
 .lines li span:nth-child(2){color:var(--muted);}
 .lines li span:last-child{text-align:right;font-variant-numeric:tabular-nums;}
 .rec-act{display:flex;gap:4px;justify-content:flex-end;padding-bottom:2px;}
+.meal-block{margin-bottom:22px;}
+.meal-block:last-child{margin-bottom:0;}
+.meal-block h2{font-size:22px;}
 .add{display:block;margin-top:14px;}
 .add select{width:100%;height:48px;border-radius:14px;border:1px dashed var(--teal);background:transparent;color:var(--teal);font:inherit;font-weight:600;padding:0 12px;}
 
@@ -202,6 +205,13 @@ button{font:inherit;color:inherit;cursor:pointer;}
 .ad-card span{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 html.ad-on main{padding-top:calc(var(--ad-top-h,70px) + 14px);padding-bottom:calc(var(--ad-bot-h,70px) + 28px);}
 html.ad-on .toast{bottom:calc(var(--ad-bot-h,70px) + 14px);}
+.trajet{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:12px;}
+.trajet summary{font-weight:600;cursor:pointer;min-height:28px;}
+.trajet .info{margin:8px 0;}
+.reglages-essence{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 2px;}
+.reglages-essence label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);}
+.reglages-essence input{width:80px;height:38px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);text-align:center;font:inherit;font-variant-numeric:tabular-nums;padding:0 6px;}
+.trajet-ligne{margin:0 0 8px;font-size:13px;color:var(--muted);}
 .install{text-align:left;display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;background:var(--pale);border-radius:14px;padding:10px 12px;margin-top:14px;font-size:14px;}
 .install[hidden]{display:none;}
 .install span{flex:1 1 220px;}
@@ -236,7 +246,7 @@ details.about a{color:var(--teal);}
   <div class="ad ad-haut" id="ad-haut" role="complementary" aria-label="Publicité" hidden></div>
   <header>
     <h1>Menu Caillou</h1>
-    <p class="sub">Tes dîners de la semaine, chiffrés en francs pacifique.</p>
+    <p class="sub">Tes repas de la semaine, chiffrés en francs pacifique.</p>
     <div class="install" id="install" hidden>
       <span id="install-txt"></span>
       <button type="button" class="btn primary" id="install-btn">Installer</button>
@@ -262,11 +272,27 @@ details.about a{color:var(--teal);}
       </div>
     </div>
     <div class="field">
-      <label for="v-dinners">Dîners</label>
+      <label for="v-pdj">Petits-déj.</label>
       <div class="step">
-        <button type="button" data-act="dinners-" aria-label="Un dîner de moins">−</button>
-        <output id="v-dinners">5</output>
-        <button type="button" data-act="dinners+" aria-label="Un dîner de plus">+</button>
+        <button type="button" data-act="cnt-" data-meal="pdj" aria-label="Un petit-déjeuner de moins">−</button>
+        <output id="v-pdj">5</output>
+        <button type="button" data-act="cnt+" data-meal="pdj" aria-label="Un petit-déjeuner de plus">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="v-dej">Déjeuners</label>
+      <div class="step">
+        <button type="button" data-act="cnt-" data-meal="dej" aria-label="Un déjeuner de moins">−</button>
+        <output id="v-dej">5</output>
+        <button type="button" data-act="cnt+" data-meal="dej" aria-label="Un déjeuner de plus">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="v-din">Dîners</label>
+      <div class="step">
+        <button type="button" data-act="cnt-" data-meal="din" aria-label="Un dîner de moins">−</button>
+        <output id="v-din">5</output>
+        <button type="button" data-act="cnt+" data-meal="din" aria-label="Un dîner de plus">+</button>
       </div>
     </div>
     <div class="field">
@@ -428,7 +454,16 @@ const ING = {
   farine:['Farine','ep','kg',270],
   huile:['Huile','ep','L',600],
   soja:['Sauce soja','ep','L',2300],
-  curry:['Curry','ep','pce',350,'sachet']
+  curry:['Curry','ep','pce',350,'sachet'],
+  pain:['Pain (baguette)','ep','pce',220,'baguette'],
+  beurre:['Beurre','cr','pce',950,'plaquette'],
+  confiture:['Confiture','ep','pce',850,'pot'],
+  cafe:['Café moulu','ep','pce',1400,'paquet'],
+  lait:['Lait','cr','L',280],
+  cereales:['Céréales','ep','pce',1200,'paquet'],
+  thonconserve:['Thon en conserve','ep','pce',450,'boîte'],
+  mayonnaise:['Mayonnaise','ep','pce',750,'pot'],
+  yaourt:['Yaourts','cr','pce',650,'pack']
 };
 const R_ORDER = ['fl','vp','cr','ep','surg'];
 const R_NAME = {fl:'Fruits, légumes et tubercules', vp:'Viandes et poissons', cr:'Crèmerie et œufs', ep:'Épicerie', surg:'Plats surgelés (prix à confirmer)'};
@@ -444,8 +479,8 @@ const EQ = {
 const EQ_ORDER = ['plaques','four','riz','thermo','air'];
 
 // Recettes maison (textes originaux). Quantités pour 4 adultes ; « how » = comment faire selon le matériel ; « any » = sans cuisson.
-function rc(n, e, t, tag, prot, lines, how){
-  return {n, e, t, tag, prot, how, l: lines.split(',').map(s => { const [id, q] = s.trim().split(/\s+/); return [id, parseFloat(q)]; })};
+function rc(n, e, t, tag, prot, lines, how, meal){
+  return {n, e, t, tag, prot, how, meal: meal || 'din', l: lines.split(',').map(s => { const [id, q] = s.trim().split(/\s+/); return [id, parseFloat(q)]; })};
 }
 const REC = {
   bougna: rc('Bougna à la casserole','🥥',60,'Local','poulet','cuisse .9, igname .6, patate .4, banane .4, coco 2, oignon .2',
@@ -552,60 +587,60 @@ const REC = {
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 180 °C.", air:"10 à 12 min à 180 °C, en mélangeant à mi-cuisson."}),
   surggratin: rc('Gratin dauphinois au jambon (surgelé, type Thiriet)','🧊',35,'Surgelé','porc','surggratin 4',
     {four:"Réchauffe selon l'indication de l'emballage, en général 35 à 40 min à 180 °C.", air:"18 à 20 min à 170 °C, en surveillant."}),
-  surglegumes: rc('Poêlée de légumes grillés (surgelé, type Thiriet)','🧊',20,'Surgelé','veg','surglegumes 4',
+  surglegumes: rc('Poêlée de légumes grillés (surgelé, type Thiriet)','🧊',20,'Surgelé','veg','surglegumes 4, riz .3',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 min à 200 °C.", air:"10 à 12 min à 190 °C, en secouant à mi-cuisson."}),
   surgcarbonara: rc('Tagliatelles à la carbonara (surgelé, type Thiriet)','🧊',25,'Surgelé','porc','surgcarbonara 4',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"12 à 15 min à 180 °C, en surveillant."})
 ,
-  thcalamars: rc('Beignets calamars romaine (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thcalamars 4',
+  thcalamars: rc('Beignets calamars romaine (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thcalamars 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 190 °C.", air:"12 à 15 min à 190 °C, en surveillant selon l'indication de l'emballage."}),
-  thcolintom: rc('Portions de colin pané, sauce tomate (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thcolintom 4',
+  thcolintom: rc('Portions de colin pané, sauce tomate (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thcolintom 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thcabpane: rc('Portions de cabillaud panées (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thcabpane 4',
+  thcabpane: rc('Portions de cabillaud panées (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thcabpane 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thmerlu: rc('Filets de merlu meunière (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thmerlu 4',
+  thmerlu: rc('Filets de merlu meunière (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thmerlu 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thcolinalaska: rc('Portions de colin Alaska panées (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thcolinalaska 4',
+  thcolinalaska: rc('Portions de colin Alaska panées (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thcolinalaska 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 190 °C.", air:"12 à 15 min à 190 °C, en surveillant selon l'indication de l'emballage."}),
-  thcroqcolin: rc('Croquettes de colin et fines herbes (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thcroqcolin 4',
+  thcroqcolin: rc('Croquettes de colin et fines herbes (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thcroqcolin 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 190 °C.", air:"12 à 15 min à 190 °C, en surveillant selon l'indication de l'emballage."}),
-  thtruitepaves: rc('Pavés de truite (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thtruitepaves 4',
+  thtruitepaves: rc('Pavés de truite (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thtruitepaves 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thbatcolin: rc('Bâtonnets de colin Alaska (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thbatcolin 4',
+  thbatcolin: rc('Bâtonnets de colin Alaska (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thbatcolin 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 190 °C.", air:"12 à 15 min à 190 °C, en surveillant selon l'indication de l'emballage."}),
-  thegleschips: rc('Filets d\'églefin façon fish and chips (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thegleschips 4',
+  thegleschips: rc('Filets d\'églefin façon fish and chips (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thegleschips 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thnugsaumon: rc('Nuggets de saumon panés (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thnugsaumon 4',
+  thnugsaumon: rc('Nuggets de saumon panés (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thnugsaumon 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 190 °C.", air:"12 à 15 min à 190 °C, en surveillant selon l'indication de l'emballage."}),
-  thnugcolinmoz: rc('Nuggets de colin mozzarella (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thnugcolinmoz 4',
+  thnugcolinmoz: rc('Nuggets de colin mozzarella (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thnugcolinmoz 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 190 °C.", air:"12 à 15 min à 190 °C, en surveillant selon l'indication de l'emballage."}),
-  thcolinalaskaxl: rc('Portions de colin Alaska panées (grand format) (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thcolinalaskaxl 4',
+  thcolinalaskaxl: rc('Portions de colin Alaska panées (grand format) (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thcolinalaskaxl 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thcabcroustillant: rc('Cabillaud pané croustillant (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thcabcroustillant 4',
+  thcabcroustillant: rc('Cabillaud pané croustillant (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thcabcroustillant 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thgoujonsaumonette: rc('Goujons de saumonette (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thgoujonsaumonette 4',
+  thgoujonsaumonette: rc('Goujons de saumonette (surgelé, type Thiriet)','🧊',20,'Surgelé','poisson','thgoujonsaumonette 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 190 °C.", air:"12 à 15 min à 190 °C, en surveillant selon l'indication de l'emballage."}),
-  thcoeurmerlu: rc('Cœur de merlu, sauce au cap (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thcoeurmerlu 4',
+  thcoeurmerlu: rc('Cœur de merlu, sauce au cap (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thcoeurmerlu 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thtruitesaumonee: rc('Filets de truite saumonée (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thtruitesaumonee 4',
+  thtruitesaumonee: rc('Filets de truite saumonée (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thtruitesaumonee 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thmorceauxcabillaud: rc('Morceaux choisis de cabillaud (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thmorceauxcabillaud 4',
+  thmorceauxcabillaud: rc('Morceaux choisis de cabillaud (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thmorceauxcabillaud 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thpavesaumonsanspeau: rc('Pavés de saumon sans peau (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thpavesaumonsanspeau 4',
+  thpavesaumonsanspeau: rc('Pavés de saumon sans peau (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thpavesaumonsanspeau 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
   thcoeureglefin: rc('Cœur de filet d\'églefin (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thcoeureglefin 4',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thpavesaumonatl: rc('Pavés de saumon Atlantique (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thpavesaumonatl 4',
+  thpavesaumonatl: rc('Pavés de saumon Atlantique (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thpavesaumonatl 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thpavesaumonbio: rc('Pavés de saumon bio (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thpavesaumonbio 4',
+  thpavesaumonbio: rc('Pavés de saumon bio (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thpavesaumonbio 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thfiletcabpanes: rc('Filets de cabillaud panés (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thfiletcabpanes 4',
+  thfiletcabpanes: rc('Filets de cabillaud panés (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thfiletcabpanes 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thfiletcolinlieu: rc('Filets de colin lieu (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thfiletcolinlieu 4',
+  thfiletcolinlieu: rc('Filets de colin lieu (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thfiletcolinlieu 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thfiletcabportion: rc('Filets de cabillaud en portion (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thfiletcabportion 4',
+  thfiletcabportion: rc('Filets de cabillaud en portion (surgelé, type Thiriet)','🧊',30,'Surgelé','poisson','thfiletcabportion 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thnemscabillaud: rc('Nems au cabillaud et à la morue (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thnemscabillaud 4',
+  thnemscabillaud: rc('Nems au cabillaud et à la morue (surgelé, type Thiriet)','🧊',25,'Surgelé','poisson','thnemscabillaud 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
   thporccaramel: rc('Porc au caramel et riz (surgelé, type Thiriet)','🧊',25,'Surgelé','porc','thporccaramel 4',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
@@ -627,43 +662,106 @@ const REC = {
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
   thpoulcurrycoco: rc('Poulet au curry coco et riz (surgelé, type Thiriet)','🧊',25,'Surgelé','poulet','thpoulcurrycoco 4',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thboudinnoir: rc('Boudins noirs antillais (surgelé, type Thiriet)','🧊',25,'Surgelé','porc','thboudinnoir 4',
+  thboudinnoir: rc('Boudins noirs antillais (surgelé, type Thiriet)','🧊',25,'Surgelé','porc','thboudinnoir 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thboudinblanc: rc('Boudins blancs antillais (surgelé, type Thiriet)','🧊',25,'Surgelé','porc','thboudinblanc 4',
+  thboudinblanc: rc('Boudins blancs antillais (surgelé, type Thiriet)','🧊',25,'Surgelé','porc','thboudinblanc 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thgratincourg: rc('Gratin de courgettes (surgelé, type Thiriet)','🧊',30,'Surgelé','veg','thgratincourg 4',
+  thgratincourg: rc('Gratin de courgettes (surgelé, type Thiriet)','🧊',30,'Surgelé','veg','thgratincourg 4, riz .3',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
   thcouscous: rc('Couscous (surgelé, type Thiriet)','🧊',30,'Surgelé','boeuf','thcouscous 4',
     {four:"Réchauffe selon l'indication de l'emballage, en général 30 à 40 min à 180 °C.", air:"18 à 22 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thbonbonsnoirs: rc('Bonbons noirs antillais (surgelé, type Thiriet)','🧊',25,'Surgelé','porc','thbonbonsnoirs 4',
+  thbonbonsnoirs: rc('Bonbons noirs antillais (surgelé, type Thiriet)','🧊',25,'Surgelé','porc','thbonbonsnoirs 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 25 à 30 min à 180 °C.", air:"15 à 18 min à 180 °C, en surveillant selon l'indication de l'emballage."}),
-  thsamoussasboeuf: rc('Samoussas au bœuf (surgelé, type Thiriet)','🧊',20,'Surgelé','boeuf','thsamoussasboeuf 4',
+  thsamoussasboeuf: rc('Samoussas au bœuf (surgelé, type Thiriet)','🧊',20,'Surgelé','boeuf','thsamoussasboeuf 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 190 °C.", air:"12 à 15 min à 190 °C, en surveillant selon l'indication de l'emballage."}),
-  thdimsumpoulet: rc('Dim sum au poulet (surgelé, type Thiriet)','🧊',20,'Surgelé','poulet','thdimsumpoulet 4',
+  thdimsumpoulet: rc('Dim sum au poulet (surgelé, type Thiriet)','🧊',20,'Surgelé','poulet','thdimsumpoulet 4, riz .3, salade 1',
     {four:"Réchauffe selon l'indication de l'emballage, en général 20 à 25 min à 190 °C.", air:"12 à 15 min à 190 °C, en surveillant selon l'indication de l'emballage."}),
+
+  /* ---- Petits-déjeuners ---- */
+  pdjtartines: rc('Tartines beurre et confiture, café','🍞',10,'Rapide','veg','pain 2, beurre .5, confiture .4, cafe .15, lait .3',
+    {any:"Sans cuisson : pain tartiné de beurre et de confiture, café ou café au lait à côté."}, 'pdj'),
+  pdjcereales: rc('Bol de céréales et lait','🥣',5,'Rapide','veg','cereales 1, lait 1',
+    {any:"Sans cuisson : céréales versées dans le lait."}, 'pdj'),
+  pdjoeufpain: rc('Œufs et pain grillé','🍳',10,'Rapide','oeuf','oeuf 4, pain 1, beurre .2',
+    {plaques:"Œufs au plat ou brouillés, 5 min à la poêle. Pain doré à côté."}, 'pdj'),
+  pdjyaourt: rc('Yaourts et céréales','🥣',5,'Rapide','veg','yaourt 4, cereales .6',
+    {any:"Sans cuisson : céréales mélangées ou versées sur les yaourts."}, 'pdj'),
+  pdjpainfromage: rc('Pain, fromage et café','🧀',5,'Rapide','veg','pain 2, fromage .15, cafe .15, lait .2',
+    {any:"Sans cuisson : pain et fromage, café ou café au lait à côté."}, 'pdj'),
+  pdjomelette: rc('Omelette légère et pain','🍳',10,'Rapide','oeuf','oeuf 6, pain 1, beurre .1',
+    {plaques:"Omelette battue, cuite 4 à 5 min à feu doux. Pain à côté."}, 'pdj'),
+  pdjthontartine: rc('Tartines au thon','🐟',10,'Rapide','poisson','pain 2, thonconserve 1, mayonnaise .1',
+    {any:"Sans cuisson : thon égoutté et mayonnaise étalés sur le pain."}, 'pdj'),
+  pdjcroque: rc('Croque simple jambon-fromage','🥪',10,'Rapide','porc','pain 2, jambon .2, fromage .15, beurre .1',
+    {plaques:"Pain doré au beurre, jambon et fromage fondu à la poêle, 5 min à couvert.", four:"10 min à 200 °C, sur une plaque."}, 'pdj'),
+  pdjjambonbeurre: rc('Tartines jambon-beurre','🥖',5,'Rapide','porc','pain 2, jambon .2, beurre .2',
+    {any:"Sans cuisson : beurre et jambon sur le pain."}, 'pdj'),
+  /* ---- Déjeuners ---- */
+  dejsandwichjb: rc('Sandwich jambon-beurre','🥪',10,'Rapide','porc','pain 2, jambon .3, beurre .2, salade .5',
+    {any:"Sans cuisson : pain garni de beurre, jambon et salade."}, 'dej'),
+  dejsandwichthon: rc('Sandwich au thon et crudités','🐟',10,'Rapide','poisson','pain 2, thonconserve 1.5, mayonnaise .15, salade .5, tomate .3',
+    {any:"Sans cuisson : thon égoutté, mayonnaise et crudités dans le pain."}, 'dej'),
+  dejsaladethon: rc('Salade composée au thon','🥗',15,'Léger','poisson','thonconserve 1.5, salade 1, tomate .4, concombre .3, oeuf 4, mayonnaise .1',
+    {plaques:"Œufs durs 9 min à l'eau bouillante, refroidis puis écalés. Le reste s'assemble cru."}, 'dej'),
+  dejwrappoulet: rc('Sandwich poulet et crudités','🍗',20,'Rapide','poulet','pain 2, cuisse .5, salade .5, tomate .3, mayonnaise .1',
+    {plaques:"Poulet désossé poêlé 8 à 10 min, refroidi puis tranché dans le pain avec les crudités.", air:"Poulet à l'air fryer 12 à 15 min à 190 °C, puis tranché dans le pain."}, 'dej'),
+  dejcesar: rc('Salade César simplifiée','🥗',20,'Léger','poulet','salade 1, cuisse .5, fromage .1, oeuf 4, pain .5',
+    {plaques:"Poulet poêlé 8 à 10 min et coupé en lanières, œufs durs 9 min à l'eau, pain doré en croûtons à la poêle."}, 'dej'),
+  dejomeletsalade: rc('Omelette et salade verte','🍳',15,'Léger','oeuf','oeuf 8, salade 1, tomate .3',
+    {plaques:"Omelette cuite 5 min à feu doux, servie avec la salade."}, 'dej'),
+  dejsaladeriz: rc('Salade de riz, thon et crudités','🍚',20,'Léger','poisson','riz .3, thonconserve 1.5, mais 1, tomate .3, concombre .3, mayonnaise .15',
+    {plaques:"Riz cuit 12 min à l'eau, refroidi puis mélangé aux autres ingrédients.", riz:"Riz cuit au cuiseur, refroidi avant de mélanger."}, 'dej'),
+  dejcroquemonsieur: rc('Croque-monsieur','🥪',15,'Rapide','porc','pain 2, jambon .3, fromage .2, beurre .1',
+    {plaques:"Pain doré au beurre, jambon et fromage fondu à la poêle à couvert, 5 à 6 min.", four:"10 à 12 min à 200 °C.", air:"6 à 8 min à 190 °C."}, 'dej'),
+  dejsaladepates: rc('Salade de pâtes au thon','🍝',20,'Léger','poisson','pates .3, thonconserve 1.5, tomate .4, mais 1, mayonnaise .15',
+    {plaques:"Pâtes cuites 10 min à l'eau bouillante, égouttées, refroidies puis mélangées aux autres ingrédients."}, 'dej'),
+  dejboeufsalade: rc('Salade de bœuf froide','🥩',20,'Léger','boeuf','boeuf .4, salade 1, tomate .3, oignon .1',
+    {plaques:"Bœuf saisi 3 à 4 min par face, refroidi puis tranché finement sur la salade."}, 'dej'),
+  dejsandwichoeuf: rc('Sandwich œuf mayonnaise','🥚',10,'Rapide','oeuf','pain 2, oeuf 6, mayonnaise .15, salade .3',
+    {plaques:"Œufs durs 9 min à l'eau, écrasés à la fourchette avec la mayonnaise, puis garnis dans le pain."}, 'dej'),
 };
 
 /* ---------- État ---------- */
 const KEY = 'menu-caillou-v1';
-let S = {adults:2, kids:2, dinners:5, budget:15000, menu:[], checked:{}, prices:{}, tab:'menu', open:{}};
+const MEAL_ORDER = ['pdj', 'dej', 'din'];
+const MEAL_NOM = {pdj: 'Petit-déjeuner', dej: 'Déjeuner', din: 'Dîner'};
+const MEAL_LABEL = {pdj: 'Petits-déj.', dej: 'Déjeuners', din: 'Dîners'};
+let S = {adults:2, kids:2, budget:15000, menus:{pdj:[], dej:[], din:[]}, counts:{pdj:5, dej:5, din:5}, checked:{}, prices:{}, tab:'menu', open:{}};
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
+// reprise d'une ancienne sauvegarde (un seul menu de dîners)
+if (Array.isArray(S.menu) || S.dinners !== undefined){
+  S.menus = S.menus || {pdj: [], dej: [], din: []};
+  if (Array.isArray(S.menu) && !S.menus.din.length) S.menus.din = S.menu;
+  S.counts = S.counts || {pdj: 5, dej: 5, din: 5};
+  if (S.dinners !== undefined) S.counts.din = S.dinners;
+  delete S.menu; delete S.dinners;
+}
 (function verifierEtat(){
   const nb = (v, min, max, def) => { const n = parseInt(v, 10); return isNaN(n) ? def : Math.min(max, Math.max(min, n)); };
   S.adults = nb(S.adults, 1, 10, 2); S.kids = nb(S.kids, 0, 10, 0);
-  S.budget = nb(S.budget, 1, 5000000, 15000); S.dinners = nb(S.dinners, 1, 7, 5);
+  S.budget = nb(S.budget, 1, 5000000, 15000);
   if (['menu', 'shop', 'prices'].indexOf(S.tab) < 0) S.tab = 'menu';
-  if (!Array.isArray(S.menu)) S.menu = [];
+  if (!S.menus || typeof S.menus !== 'object') S.menus = {};
+  if (!S.counts || typeof S.counts !== 'object') S.counts = {};
+  MEAL_ORDER.forEach(m => {
+    if (!Array.isArray(S.menus[m])) S.menus[m] = [];
+    S.counts[m] = nb(S.counts[m], 1, 7, 5);
+  });
   ['prices', 'checked', 'open'].forEach(k => { if (!S[k] || typeof S[k] !== 'object' || Array.isArray(S[k])) S[k] = {}; });
   ['auto', 'stores'].forEach(k => { if (S[k] !== undefined && (!S[k] || typeof S[k] !== 'object' || Array.isArray(S[k]))) delete S[k]; });
 })();
 if (S.people !== undefined){ if (!S.migrated){ S.adults = S.people; S.kids = 0; } delete S.people; }
 S.migrated = true;
 if (!S.stores) S.stores = {};
+if (!S.magasins || typeof S.magasins !== 'object') S.magasins = {};
+if (!S.pos || typeof S.pos !== 'object') S.pos = null;
+if (!(S.conso > 0)) S.conso = 8;
+if (!(S.prixL > 0)) S.prixL = 155;
 if (!Array.isArray(S.eq)) S.eq = ['plaques'];
 S.eq = S.eq.filter(e => EQ[e]);
 if (!S.eq.length) S.eq = ['plaques'];
 if (!S.auto){ S.auto = S.priceInfo ? S.prices : {}; if (S.priceInfo) S.prices = {}; }
-S.menu = (S.menu || []).filter(id => REC[id]);
+MEAL_ORDER.forEach(m => { S.menus[m] = S.menus[m].filter(id => REC[id] && REC[id].meal === m); });
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
 /* ---------- Calculs ---------- */
@@ -704,53 +802,74 @@ function qtyText(id, q, buy){
 }
 const unitLabel = id => { const u = ING[id][2]; return u === 'pce' ? (ING[id][4] || 'pièce') : u; };
 const platOk = id => { const w = REC[id].how; return !!w.any || EQ_ORDER.some(e => w[e] && S.eq.includes(e)); };
-const dispo = () => Object.keys(REC).filter(platOk);
+const dispoFor = meal => Object.keys(REC).filter(id => REC[id].meal === meal && platOk(id));
+const allMeals = () => MEAL_ORDER.reduce((a, m) => a.concat(S.menus[m]), []);
+const weeklyTotal = () => shopping(allMeals()).total;
+const autresRepasTotal = meal => MEAL_ORDER.filter(m => m !== meal).reduce((a, m) => a + shopping(S.menus[m]).total, 0);
+const MEAL_PART = {pdj: 0.15, dej: 0.30, din: 0.55}; // répartition du budget à la toute première génération
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 /* ---------- Composition du menu ---------- */
-function generate(){
-  const all = dispo(), n = Math.min(S.dinners, all.length);
-  let best = null, bestScore = -1, cheapest = null, cheapT = Infinity;
-  for (let i = 0; i < 400; i++){
-    const ids = shuffle(all).slice(0, n), t = shopping(ids).total;
-    if (t < cheapT){ cheapT = t; cheapest = ids; }
-    if (t <= S.budget){
-      const score = new Set(ids.map(id => REC[id].prot)).size + Math.random() * .9 + (t / S.budget) * .3;
-      if (score > bestScore){ bestScore = score; best = ids; }
+function generateMeal(meal, ceiling){
+  const budgetDispo = ceiling !== undefined ? Math.max(0, ceiling) : Math.max(0, S.budget - autresRepasTotal(meal));
+  const all = dispoFor(meal);
+  if (!all.length){ S.menus[meal] = []; S.counts[meal] = 0; S.open = {}; return; }
+  const nMax = Math.min(S.counts[meal], all.length);
+  // Essaie d'abord le nombre de plats demandé ; si le budget ne suit pas, réduit la variété
+  // (moins de plats différents, donc plus de répétition dans la semaine) plutôt que dépasser.
+  for (let n = nMax; n >= 1; n--){
+    let best = null, bestScore = -1;
+    for (let i = 0; i < 600; i++){
+      const ids = shuffle(all).slice(0, n), t = shopping(ids).total;
+      if (t <= budgetDispo){
+        const score = new Set(ids.map(id => REC[id].prot)).size + Math.random() * .9 + (t / (budgetDispo || 1)) * .3;
+        if (score > bestScore){ bestScore = score; best = ids; }
+      }
     }
+    if (best){ S.menus[meal] = best; S.counts[meal] = n; S.open = {}; return; }
   }
-  S.menu = best || cheapest;
+  // Même un seul plat dépasse le budget disponible : on garde le moins cher de tous, seul.
+  const moinsCher = all.map(id => [id, recipeCost(id)]).sort((a, b) => a[1] - b[1])[0][0];
+  S.menus[meal] = [moinsCher];
+  S.counts[meal] = 1;
   S.open = {};
 }
-function pickToAdd(){
-  const rest = dispo().filter(id => !S.menu.includes(id));
+function pickToAdd(meal){
+  const budgetDispo = Math.max(0, S.budget - autresRepasTotal(meal));
+  const rest = dispoFor(meal).filter(id => !S.menus[meal].includes(id));
   if (!rest.length) return null;
-  const ok = rest.filter(id => shopping(S.menu.concat(id)).total <= S.budget);
+  const ok = rest.filter(id => shopping(S.menus[meal].concat(id)).total <= budgetDispo);
   if (ok.length) return ok[Math.floor(Math.random() * ok.length)];
   return rest.map(id => [id, recipeCost(id)]).sort((a, b) => a[1] - b[1])[0][0];
 }
-function setDinners(n){
+function setCount(meal, n){
   n = Math.max(1, Math.min(7, n));
-  while (S.menu.length > n) S.menu.pop();
-  for (let g = 0; S.menu.length < n && g < 30; g++){ const id = pickToAdd(); if (!id) break; S.menu.push(id); }
-  S.dinners = S.menu.length;
+  while (S.menus[meal].length > n) S.menus[meal].pop();
+  for (let g = 0; S.menus[meal].length < n && g < 30; g++){ const id = pickToAdd(meal); if (!id) break; S.menus[meal].push(id); }
+  S.counts[meal] = S.menus[meal].length;
 }
 function ajusterMenu(){
-  const mauvais = S.menu.filter(id => !platOk(id));
-  if (!mauvais.length) return 0;
-  S.menu = S.menu.filter(platOk);
-  for (let g = 0; S.menu.length < S.dinners && g < 30; g++){ const id = pickToAdd(); if (!id) break; S.menu.push(id); }
-  S.dinners = S.menu.length; S.open = {};
-  return mauvais.length;
+  let mauvaisTotal = 0;
+  MEAL_ORDER.forEach(meal => {
+    const mauvais = S.menus[meal].filter(id => !platOk(id));
+    if (mauvais.length){ S.menus[meal] = S.menus[meal].filter(platOk); mauvaisTotal += mauvais.length; }
+  });
+  MEAL_ORDER.forEach(meal => {
+    for (let g = 0; S.menus[meal].length < S.counts[meal] && g < 30; g++){ const id = pickToAdd(meal); if (!id) break; S.menus[meal].push(id); }
+    S.counts[meal] = S.menus[meal].length;
+  });
+  if (mauvaisTotal) S.open = {};
+  return mauvaisTotal;
 }
 function swap(id){
-  const idx = S.menu.indexOf(id); if (idx < 0) return;
-  const rest = dispo().filter(r => !S.menu.includes(r));
+  const meal = REC[id].meal, idx = S.menus[meal].indexOf(id); if (idx < 0) return;
+  const budgetDispo = Math.max(0, S.budget - autresRepasTotal(meal));
+  const rest = dispoFor(meal).filter(r => !S.menus[meal].includes(r));
   if (!rest.length) return;
-  const trial = r => { const m = S.menu.slice(); m[idx] = r; return shopping(m).total; };
-  const ok = rest.filter(r => trial(r) <= S.budget);
+  const trial = r => { const m = S.menus[meal].slice(); m[idx] = r; return shopping(m).total; };
+  const ok = rest.filter(r => trial(r) <= budgetDispo);
   const pick = ok.length ? ok[Math.floor(Math.random() * ok.length)] : rest.sort((a, b) => trial(a) - trial(b))[0];
-  S.menu[idx] = pick;
+  S.menus[meal][idx] = pick;
   delete S.open[id];
 }
 
@@ -759,21 +878,22 @@ function renderControls(){
   $('#v-adults').textContent = S.adults;
   $('#v-kids').textContent = S.kids;
   $('#mat').innerHTML = EQ_ORDER.map(e => `<button type="button" class="chipbtn" data-eq="${e}" aria-pressed="${S.eq.includes(e)}">${EQ[e][1]} ${EQ[e][0]}</button>`).join('');
-  $('#v-dinners').textContent = S.menu.length;
+  MEAL_ORDER.forEach(m => { const o = $('#v-' + m); if (o) o.textContent = S.counts[m]; });
   const inp = $('#in-budget');
   if (document.activeElement !== inp) inp.value = S.budget.toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g, ' ');
 }
 function renderGauge(){
-  const {total} = shopping(S.menu), b = S.budget, over = total > b;
+  const total = weeklyTotal(), b = S.budget, over = total > b;
+  const nbRepas = MEAL_ORDER.reduce((a, m) => a + S.menus[m].length, 0);
   const pct = b > 0 ? Math.min(100, total / b * 100) : 0;
   $('#gauge').classList.toggle('over', over);
   $('#g-total').textContent = fmt(total);
   const f = $('#g-fill'); f.style.width = pct + '%'; f.classList.toggle('zero', pct <= 0);
   $('#g-bar').setAttribute('aria-valuenow', Math.round(pct));
-  $('#g-msg').textContent = !S.menu.length ? 'Ajoute des plats pour chiffrer tes courses.'
+  $('#g-msg').textContent = !nbRepas ? 'Ajoute des plats pour chiffrer tes courses.'
     : over ? 'Dépasse le budget de ' + fmt(total - b) + '.'
     : 'Il reste ' + fmt(b - total) + ' sur ' + fmt(b) + '.';
-  $('#g-per').textContent = S.menu.length ? '≈ ' + fmt(total / (heads() * S.menu.length)) + ' par personne et par dîner' : '';
+  $('#g-per').textContent = nbRepas ? '≈ ' + fmt(total / heads()) + ' par personne pour la semaine' : '';
 }
 function recipeItem(id){
   const r = REC[id], c = recipeCost(id), open = !!S.open[id];
@@ -799,19 +919,38 @@ function recipeItem(id){
   </li>`;
 }
 function renderMenu(){
-  const rest = dispo().filter(id => !S.menu.includes(id));
-  $('#panel').innerHTML =
-    `<div class="head"><h2>Menu de la semaine</h2><button type="button" class="btn primary" data-act="new">Nouveau menu</button></div>` +
-    (S.menu.length ? `<ul class="recipes">${S.menu.map(recipeItem).join('')}</ul>` : `<p class="empty">Aucun plat pour l'instant. Ajoute-en un ou compose un nouveau menu.</p>`) +
-    (rest.length ? `<label class="add"><span class="sr">Ajouter un plat</span><select id="add-sel"><option value="">Ajouter un plat…</option>${rest.map(id => `<option value="${id}">${REC[id].n} (${fmt(recipeCost(id))})</option>`).join('')}</select></label>` : '');
+  $('#panel').innerHTML = MEAL_ORDER.map(meal => {
+    const menu = S.menus[meal], rest = dispoFor(meal).filter(id => !menu.includes(id));
+    return `<section class="meal-block">
+      <div class="head"><h2>${MEAL_NOM[meal]}</h2><button type="button" class="btn primary" data-act="new" data-meal="${meal}">Nouveau menu</button></div>` +
+      (menu.length ? `<ul class="recipes">${menu.map(recipeItem).join('')}</ul>` : `<p class="empty">Aucun plat pour l'instant. Ajoute-en un ou compose un nouveau menu.</p>`) +
+      (rest.length ? `<label class="add"><span class="sr">Ajouter un plat (${MEAL_NOM[meal]})</span><select data-meal="${meal}" class="add-sel"><option value="">Ajouter un plat…</option>${rest.map(id => `<option value="${id}">${REC[id].n} (${fmt(recipeCost(id))})</option>`).join('')}</select></label>` : '') +
+      `</section>`;
+  }).join('');
 }
 const NOSTORE = 'Enseigne non connue';
+function distanceKm(lat1, lon1, lat2, lon2){
+  const R = 6371, rad = x => x * Math.PI / 180;
+  const dLat = rad(lat2 - lat1), dLon = rad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+function coutEssence(km){ return (2 * km / 100) * S.conso * S.prixL; }
+function localiser(){
+  if (!navigator.geolocation){ toast("Ta position n'est pas disponible sur cet appareil"); return; }
+  toast('Recherche de ta position…');
+  navigator.geolocation.getCurrentPosition(
+    p => { S.pos = {lat: p.coords.latitude, lon: p.coords.longitude}; toast('Position enregistrée'); renderAll(); },
+    () => toast("Position refusée ou indisponible"),
+    {timeout: 8000, maximumAge: 600000}
+  );
+}
 function shopItem(x, showStore){
   const done = !!S.checked[x.id], st = showStore ? storeOf(x.id) : '';
   return `<li class="item ${done ? 'done' : ''}"><input type="checkbox" id="ck-${x.id}" data-ck="${x.id}" ${done ? 'checked' : ''}><label class="nm" for="ck-${x.id}">${ING[x.id][0]}${st ? `<small class="st">${esc(st)}</small>` : ''}</label><span class="q">${qtyText(x.id, x.q, true)}</span><span class="c">${fmt(x.cost)}</span></li>`;
 }
 function renderShop(){
-  const {items, total} = shopping(S.menu);
+  const {items, total} = shopping(allMeals());
   if (!items.length){ $('#panel').innerHTML = `<p class="empty">Ta liste est vide. Compose ton menu pour la remplir.</p><button type="button" class="btn primary" data-tab-go="menu">Aller au menu</button>`; return; }
   const known = items.some(x => storeOf(x.id));
   const view = known && S.shopView === 'store' ? 'store' : 'rayon';
@@ -821,9 +960,28 @@ function renderShop(){
     const by = {};
     items.forEach(x => { const s = storeOf(x.id) || NOSTORE; (by[s] = by[s] || []).push(x); });
     const sub = n => by[n].reduce((a, x) => a + x.cost, 0);
+    const dispoTrajet = Object.keys(by).some(n => n !== NOSTORE && S.magasins[n]);
+    const trajetOuvert = !!($('.trajet') && $('.trajet').open);
+    html += `<details class="trajet"${trajetOuvert ? ' open' : ''}><summary>Distance et essence</summary>` +
+      (S.pos ? `<p class="info">Position enregistrée. <button type="button" class="lnk" data-act="localiser">Actualiser</button></p>` : `<button type="button" class="btn" data-act="localiser">Utiliser ma position</button>`) +
+      `<div class="reglages-essence">
+        <label>Consommation<input type="text" inputmode="decimal" data-conso value="${S.conso}"><span>L / 100 km</span></label>
+        <label>Prix du litre<input type="text" inputmode="decimal" data-prixl value="${S.prixL}"><span>F</span></label>
+      </div>` +
+      (dispoTrajet ? '' : `<p class="info">Distance inconnue pour ces enseignes pour l'instant.</p>`) +
+      `</details>`;
     Object.keys(by).sort((a, b) => ((a === NOSTORE) - (b === NOSTORE)) || (sub(b) - sub(a))).forEach(n => {
       const it = by[n].sort((a, b) => ING[a.id][0].localeCompare(ING[b.id][0], 'fr'));
-      html += `<div class="group"><h3><span>${esc(n)}</span><span class="sub">${fmt(sub(n))}</span></h3><ul class="items">` + it.map(x => shopItem(x, false)).join('') + `</ul></div>`;
+      let trajet = '';
+      const c = S.magasins[n];
+      if (n !== NOSTORE && c && S.pos){
+        const km = distanceKm(S.pos.lat, S.pos.lon, c.lat, c.lon), essence = coutEssence(km);
+        const part = sub(n) > 0 ? Math.round(essence / sub(n) * 100) : null;
+        trajet = `<p class="trajet-ligne">${km < 1 ? Math.round(km * 1000) + ' m' : km.toFixed(1) + ' km'} · essence aller-retour ≈ ${fmt(essence)}${part !== null ? ' (' + part + ' % du panier ici)' : ''}</p>`;
+      } else if (n !== NOSTORE && !c) {
+        trajet = `<p class="trajet-ligne">Distance inconnue pour cette enseigne.</p>`;
+      }
+      html += `<div class="group"><h3><span>${esc(n)}</span><span class="sub">${fmt(sub(n))}</span></h3>${trajet}<ul class="items">` + it.map(x => shopItem(x, false)).join('') + `</ul></div>`;
     });
   } else {
     R_ORDER.forEach(r => {
@@ -862,9 +1020,10 @@ function renderAll(){ renderControls(); renderGauge(); renderPanel(); save(); }
 let toastT;
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1800); }
 function copyList(){
-  const {items} = shopping(S.menu);
+  const {items} = shopping(allMeals());
   const line = (x, withStore) => '- ' + ING[x.id][0] + ' : ' + qtyText(x.id, x.q, true) + (withStore && storeOf(x.id) ? ' (' + storeOf(x.id) + ')' : '') + '\n';
-  let t = 'Courses : ' + S.menu.length + ' dîners, ' + S.adults + (S.adults > 1 ? ' adultes' : ' adulte') + (S.kids ? ' et ' + S.kids + (S.kids > 1 ? ' enfants' : ' enfant') : '') + '\n';
+  const repasTxt = MEAL_ORDER.map(m => S.counts[m] + ' ' + MEAL_LABEL[m].toLowerCase()).join(', ');
+  let t = 'Courses : ' + repasTxt + ', ' + S.adults + (S.adults > 1 ? ' adultes' : ' adulte') + (S.kids ? ' et ' + S.kids + (S.kids > 1 ? ' enfants' : ' enfant') : '') + '\n';
   if (S.shopView === 'store' && items.some(x => storeOf(x.id))){
     const by = {};
     items.forEach(x => { const s = storeOf(x.id) || NOSTORE; (by[s] = by[s] || []).push(x); });
@@ -899,6 +1058,7 @@ function appliquerPrix(j){
   const st = {};
   if (j && j.stores) Object.keys(j.stores).forEach(id => { if (ING[id] && j.stores[id]) st[id] = String(j.stores[id]).slice(0, 60); });
   S.stores = st;
+  if (j && j.magasins && typeof j.magasins === 'object') S.magasins = j.magasins;
   S.priceInfo = {date: (j && j.date) || '', n: n};
   return n;
 }
@@ -943,32 +1103,46 @@ document.addEventListener('click', e => {
   const tab = e.target.closest('[data-tab]');
   if (tab){ S.tab = tab.dataset.tab; renderAll(); return; }
   const el = e.target.closest('[data-act]'); if (!el) return;
-  const id = el.dataset.id;
+  const id = el.dataset.id, meal = el.dataset.meal;
   switch (el.dataset.act){
     case 'adults-': S.adults = clamp(S.adults - 1, 1, 10); break;
     case 'adults+': S.adults = clamp(S.adults + 1, 1, 10); break;
     case 'kids-': S.kids = clamp(S.kids - 1, 0, 10); break;
     case 'kids+': S.kids = clamp(S.kids + 1, 0, 10); break;
-    case 'dinners-': setDinners(S.menu.length - 1); break;
-    case 'dinners+': setDinners(S.menu.length + 1); break;
+    case 'cnt-': setCount(meal, S.menus[meal].length - 1); break;
+    case 'cnt+': setCount(meal, S.menus[meal].length + 1); break;
     case 'budget-': S.budget = clamp(Math.round(S.budget / 1000) * 1000 - 1000, 1000, 500000); break;
     case 'budget+': S.budget = clamp(Math.round(S.budget / 1000) * 1000 + 1000, 1000, 500000); break;
-    case 'new': generate(); break;
+    case 'new': generateMeal(meal); break;
     case 'swap': swap(id); break;
-    case 'del': S.menu = S.menu.filter(x => x !== id); delete S.open[id]; S.dinners = S.menu.length; break;
+    case 'del': { const m = REC[id].meal; S.menus[m] = S.menus[m].filter(x => x !== id); delete S.open[id]; S.counts[m] = S.menus[m].length; break; }
     case 'toggle': S.open[id] = !S.open[id]; break;
     case 'uncheck': S.checked = {}; break;
     case 'copy': copyList(); return;
     case 'reset-prices': S.prices = {}; break;
+    case 'localiser': localiser(); return;
     case 'share': partager(); return;
   }
   renderAll();
 });
 document.addEventListener('change', e => {
-  if (e.target.id === 'add-sel' && e.target.value){ S.menu.push(e.target.value); S.dinners = S.menu.length; renderAll(); return; }
+  if (e.target.classList && e.target.classList.contains('add-sel') && e.target.value){
+    const meal = e.target.dataset.meal, val = e.target.value;
+    S.menus[meal].push(val); S.counts[meal] = S.menus[meal].length; renderAll(); return;
+  }
   if (e.target.dataset && e.target.dataset.ck){ S.checked[e.target.dataset.ck] = e.target.checked; renderShop(); save(); }
 });
 document.addEventListener('input', e => {
+  if (e.target.dataset && 'conso' in e.target.dataset){
+    const v = parseFloat((e.target.value || '').replace(',', '.'));
+    if (v > 0 && v < 50) S.conso = v;
+    save(); return;
+  }
+  if (e.target.dataset && 'prixl' in e.target.dataset){
+    const v = parseFloat((e.target.value || '').replace(',', '.'));
+    if (v > 0 && v < 2000) S.prixL = v;
+    save(); return;
+  }
   if (e.target.id === 'in-budget'){
     const v = parseInt(e.target.value.replace(/\D/g, ''), 10);
     if (!isNaN(v)){ S.budget = clamp(v, 1, 5000000); renderGauge(); save(); }
@@ -985,8 +1159,8 @@ $('#in-budget').addEventListener('keydown', e => { if (e.key === 'Enter') e.targ
 
 /* ---------- Démarrage ---------- */
 try {
-  if (!S.menu.length) generate(); else ajusterMenu();
-  S.dinners = S.menu.length;
+  const vide = MEAL_ORDER.every(m => !S.menus[m].length);
+  if (vide) MEAL_ORDER.forEach(m => generateMeal(m, S.budget * MEAL_PART[m])); else ajusterMenu();
   renderAll();
   window.__mcOk = true;
   const secours = document.getElementById('secours'); if (secours) secours.remove();
