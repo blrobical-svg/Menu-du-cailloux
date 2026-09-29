@@ -6,7 +6,7 @@ tomate : 560 F chez Korail Ducos  (produit : tomate ronde au kilo imp ; les 3 mo
 courgette : 340 F chez Casino Port Plaisance - Supermarche  (produit : courgette verte ronde au kilo loc ; les 3 moins chers : courgette verte au kilo loc 235 | courgette verte ronde au kilo loc 340 | courgette jaune au kilo loc  415)
 chou : 135 F chez Korail Ducos  (produit : chou de chine blanc au kilo loc ; les 3 moins chers : chou vert au kilo loc 120 | chou de chine blanc au kilo loc 135 | chou vert au kilo imp 150)
 poivron : 845 F chez Carrefour Market Ducos  (produit : poivron jaune au kilo imp ; les 3 moins chers : poivron vert au kilo loc 720 | poivron jaune au kilo imp 845 | poivron rouge au kilo imp 915)
-concombre : 195 F chez Cap Fraicheur  (produit : concombre vert au kilo loc ; les 3 moins chers : concombre télégraphe au kilo loc 190 | concombre vert au kilo loc 195 | savon Dalan multi-care concombre/lait pain 90 g  888)
+concombre : 355 F chez Korail Normandie  (produit : concombre vert au kilo loc ; les 3 moins chers : concombre télégraphe au kilo loc 190 | concombre vert au kilo loc 355 | concombre vert au kilo imp 365)
 salade : 220 F chez Carrefour Market Magenta  (produit : graines Tropica laitue batavia ; les 3 moins chers : graines Tropica laitue batavia 190 | livre Raphaëlle Giordano : Le jour où les lions mangeront de la salade verte 1550)
 avocat : 202 F chez Korail Ducos  (produit : avocat au kilo loc  ; les 3 moins chers : avocat au kilo imp 179 | avocat au kilo loc  202 | avocat surgelé Salud en dé sachet 500 g 348)
 citron : 495 F chez Korail Normandie  (produit : citron 4 saisons au kilo loc ; les 3 moins chers : citron lime au kilo loc 450 | citron 4 saisons au kilo loc 495 | citron 4 saisons au kilo imp 680)
@@ -53,4 +53,4 @@ huile : 220 F chez Casino Les Halles Magenta  (produit : huile de tournesol Kern
 soja : 497 F chez Korail Ducos  (produit : sauce soja/soyo Kikkoman bouteille 1,8 l ; les 3 moins chers : sauce soja The Holy Sauce bouteille 700 ml 471 | sauce soja/soyo Kikkoman bouteille 1,8 l 497 | sauce soja/soyo Kikkoman bouteille 500 ml 500)
 curry : aucun produit trouvé (le prix de départ reste utilisé)
 
-Codes de commune vus dans les relevés : {'1': 56, '2b4a4fd1-8d98-4b03-af62-d26511791a23': 15, '2': 15, '27c6d50b-21c8-4b77-846f-43d523a08847': 14, '0ccbd619-fd41-4f34-a4de-d4bdc1c0412b': 13, 'e86ad3fe-534c-4a3b-8645-e89bdca6b682': 10, '4': 9, '3': 4}
+Codes de commune vus dans les relevés : {'1': 55, '2b4a4fd1-8d98-4b03-af62-d26511791a23': 16, '2': 16, '0ccbd619-fd41-4f34-a4de-d4bdc1c0412b': 14, '27c6d50b-21c8-4b77-846f-43d523a08847': 14, 'e86ad3fe-534c-4a3b-8645-e89bdca6b682': 10, '4': 9, '3': 4}
