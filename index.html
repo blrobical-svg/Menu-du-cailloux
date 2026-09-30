@@ -67,7 +67,7 @@
 :root[data-theme="dark"] .bg-nuit{display:block;}
 html{scroll-padding-top:env(safe-area-inset-top,0px);}
 .beta-vu #beta{display:none;}
-#beta{position:fixed;inset:0;z-index:1000;color:#fff;background:#0A5A62;overflow:hidden;animation:betaOut .5s ease 5.3s forwards;}
+#beta{position:fixed;inset:0;z-index:1000;color:#fff;background:#0A5A62;overflow:hidden;animation:betaOut .5s ease 7.95s forwards;}
 .beta-photo-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
 .beta-photo-wrap img{display:block;width:100%;height:auto;}
 #beta::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,30,34,.55) 0%,rgba(6,30,34,.15) 30%,rgba(6,30,34,.15) 55%,rgba(6,30,34,.88) 100%);}
@@ -76,7 +76,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);}
 #beta .beta-t{font-size:19px;font-weight:700;margin:0;color:#fff;}
 .beta-brand{display:flex;align-items:center;gap:10px;}
 #beta .beta-b{display:inline-block;padding:5px 13px;border-radius:999px;background:#FF8A6B;color:#3A1408;font-weight:700;font-size:12px;white-space:nowrap;}
-.beta-mot{position:absolute;z-index:2;max-width:150px;text-align:center;font-family:var(--display);font-weight:700;color:#0B2B33;background:#fff;border-radius:16px;padding:8px 13px;font-size:17px;line-height:1.25;box-shadow:0 8px 20px rgba(0,0,0,.35);opacity:0;transform:translateX(-50%) translateY(6px) scale(.94);animation:betaMot 1s ease forwards;}
+.beta-mot{position:absolute;z-index:2;max-width:150px;text-align:center;font-family:var(--display);font-weight:700;color:#0B2B33;background:#fff;border-radius:16px;padding:8px 13px;font-size:17px;line-height:1.25;box-shadow:0 8px 20px rgba(0,0,0,.35);opacity:0;transform:translateX(-50%) translateY(6px) scale(.94);animation:betaMot 1.5s ease forwards;}
 .beta-mot::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:7px solid transparent;border-top-color:#fff;}
 .beta-mot:nth-of-type(1){left:21%;top:69.5%;}
 .beta-mot:nth-of-type(2){left:73%;top:69.5%;}
@@ -85,10 +85,10 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);}
 .beta-mot.finale::after{left:35%;}
 .beta-mot.finale::before{content:"";position:absolute;left:66%;top:100%;transform:translateX(-50%);border:7px solid transparent;border-top-color:#fff;}
 
-.beta-mot:nth-of-type(1){animation-delay:.15s;}
-.beta-mot:nth-of-type(2){animation-delay:1.15s;}
-.beta-mot:nth-of-type(3){animation-delay:2.15s;}
-.beta-mot:nth-of-type(4){animation-delay:3.15s;animation-duration:2.1s;}
+.beta-mot:nth-of-type(1){animation-delay:.2s;}
+.beta-mot:nth-of-type(2){animation-delay:1.7s;}
+.beta-mot:nth-of-type(3){animation-delay:3.2s;}
+.beta-mot:nth-of-type(4){animation-delay:4.7s;animation-duration:3.15s;}
 @keyframes betaMot{
   0%{opacity:0;transform:translateX(-50%) translateY(6px) scale(.94);}
   10%,88%{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
@@ -102,7 +102,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);}
 .beta-bas{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:14px 24px calc(18px + env(safe-area-inset-bottom,0px));text-align:center;}
 #beta .beta-m{margin:0;font-size:14px;line-height:1.4;color:rgba(255,255,255,.9);}
 .beta-bar{position:relative;margin:0 auto 12px;max-width:220px;height:4px;border-radius:2px;overflow:hidden;background:rgba(255,255,255,.3);}
-.beta-bar i{display:block;height:100%;width:0;background:#fff;animation:betaBar 5.3s linear forwards;}
+.beta-bar i{display:block;height:100%;width:0;background:#fff;animation:betaBar 7.95s linear forwards;}
 @keyframes betaBar{to{width:100%;}}
 @keyframes betaOut{to{opacity:0;visibility:hidden;}}
 *,*::before,*::after{box-sizing:border-box;}
@@ -1298,7 +1298,7 @@ const BETA = {contact: ''};   // e-mail ou numéro WhatsApp (ex. '+687123456') q
     if (document.documentElement.classList.contains('beta-vu')) ecran.remove();
     else {
       try { sessionStorage.setItem('mc-beta-vu', '1'); } catch (e) {}
-      setTimeout(() => ecran.remove(), 5500);
+      setTimeout(() => ecran.remove(), 8150);
     }
   }
   const a = document.getElementById('retour'), c = String(BETA.contact || '').trim();
