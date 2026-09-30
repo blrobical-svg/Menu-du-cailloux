@@ -103,6 +103,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);}
 #beta .beta-m{margin:0;font-size:14px;line-height:1.4;color:rgba(255,255,255,.9);}
 .beta-bar{position:relative;margin:0 auto 12px;max-width:220px;height:4px;border-radius:2px;overflow:hidden;background:rgba(255,255,255,.3);}
 .beta-bar i{display:block;height:100%;width:0;background:#fff;animation:betaBar 7.95s linear forwards;}
+.copyright{margin-top:10px;font-size:11px;color:var(--muted);text-align:center;}
 @keyframes betaBar{to{width:100%;}}
 @keyframes betaOut{to{opacity:0;visibility:hidden;}}
 *,*::before,*::after{box-sizing:border-box;}
@@ -390,6 +391,7 @@ details.about a{color:var(--teal);}
       <p>Menu Caillou est un outil indépendant, sans lien avec prix.nc ni avec le gouvernement de la Nouvelle-Calédonie.</p>
       <p id="about-priv">Aucune donnée personnelle n'est collectée ni envoyée : tes réglages (foyer, budget, menu) restent sur ton appareil.</p>
     </details>
+    <p class="copyright">© Bruceray <span id="copyright-annee">2026</span> — Menu Caillou. Tous droits réservés, reproduction interdite sans autorisation.</p>
   </footer>
 </main>
 <div class="ad ad-bas" id="ad-bas" role="complementary" aria-label="Publicité" hidden></div>
@@ -1400,6 +1402,7 @@ afficherPub();
 /* ---------- Écran de démarrage « version bêta » (3 secondes, une fois par session) ---------- */
 const BETA = {contact: ''};   // e-mail ou numéro WhatsApp (ex. '+687123456') qui reçoit les retours ; vide = bouton masqué
 (function(){
+  const anCopyright = document.getElementById('copyright-annee'); if (anCopyright) anCopyright.textContent = new Date().getFullYear();
   const ecran = document.getElementById('beta');
   if (ecran){
     if (document.documentElement.classList.contains('beta-vu')) ecran.remove();
