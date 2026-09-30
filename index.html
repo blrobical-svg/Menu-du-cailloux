@@ -310,6 +310,11 @@ details.about a{color:var(--teal);}
     <div class="mat" id="mat" role="group" aria-label="Mon matériel de cuisine"></div>
   </div>
 
+  <div class="mat-wrap">
+    <div class="mat-lbl">Type de repas</div>
+    <div class="mat" id="diet" role="group" aria-label="Type de repas"></div>
+  </div>
+
   <section class="gauge" id="gauge" aria-live="polite">
     <div class="lbl">Courses de la semaine</div>
     <div class="total" id="g-total">0 F</div>
@@ -477,6 +482,12 @@ const EQ = {
   air:['Air fryer','🍟','air fryer']
 };
 const EQ_ORDER = ['plaques','four','riz','thermo','air'];
+const DIET = {
+  veg: {nom: 'Végétarien', e: '🥦', prots: ['veg','oeuf']},
+  viande: {nom: 'Viande', e: '🍗', prots: ['poulet','boeuf','porc','cerf']},
+  poisson: {nom: 'Poisson et fruits de mer', e: '🐟', prots: ['poisson','crevette','moule']}
+};
+const DIET_ORDER = ['veg','viande','poisson'];
 
 // Recettes maison (textes originaux). Quantités pour 4 adultes ; « how » = comment faire selon le matériel ; « any » = sans cuisson.
 function rc(n, e, t, tag, prot, lines, how, meal){
@@ -756,6 +767,8 @@ if (!S.stores) S.stores = {};
 if (!S.magasins || typeof S.magasins !== 'object') S.magasins = {};
 if (!S.pos || typeof S.pos !== 'object') S.pos = null;
 if (!(S.conso > 0)) S.conso = 8;
+if (!Array.isArray(S.diet)) S.diet = [];
+S.diet = S.diet.filter(d => DIET[d]);
 if (!(S.prixL > 0)) S.prixL = 155;
 if (!Array.isArray(S.eq)) S.eq = ['plaques'];
 S.eq = S.eq.filter(e => EQ[e]);
@@ -801,7 +814,8 @@ function qtyText(id, q, buy){
   return s + ' ' + lab + (n > 1 ? 's' : '');
 }
 const unitLabel = id => { const u = ING[id][2]; return u === 'pce' ? (ING[id][4] || 'pièce') : u; };
-const platOk = id => { const w = REC[id].how; return !!w.any || EQ_ORDER.some(e => w[e] && S.eq.includes(e)); };
+const dietOk = id => !S.diet.length || DIET_ORDER.some(d => S.diet.includes(d) && DIET[d].prots.includes(REC[id].prot));
+const platOk = id => { const w = REC[id].how; return (!!w.any || EQ_ORDER.some(e => w[e] && S.eq.includes(e))) && dietOk(id); };
 const dispoFor = meal => Object.keys(REC).filter(id => REC[id].meal === meal && platOk(id));
 const allMeals = () => MEAL_ORDER.reduce((a, m) => a.concat(S.menus[m]), []);
 const weeklyTotal = () => shopping(allMeals()).total;
@@ -881,6 +895,7 @@ function renderControls(){
   $('#v-adults').textContent = S.adults;
   $('#v-kids').textContent = S.kids;
   $('#mat').innerHTML = EQ_ORDER.map(e => `<button type="button" class="chipbtn" data-eq="${e}" aria-pressed="${S.eq.includes(e)}">${EQ[e][1]} ${EQ[e][0]}</button>`).join('');
+  $('#diet').innerHTML = DIET_ORDER.map(d => `<button type="button" class="chipbtn" data-diet="${d}" aria-pressed="${S.diet.includes(d)}">${DIET[d].e} ${DIET[d].nom}</button>`).join('');
   MEAL_ORDER.forEach(m => { const o = $('#v-' + m); if (o) o.textContent = S.counts[m]; });
   const inp = $('#in-budget');
   if (document.activeElement !== inp) inp.value = S.budget.toLocaleString('fr-FR').replace(/[\u202f\u00a0]/g, ' ');
@@ -1097,6 +1112,16 @@ document.addEventListener('click', e => {
     if (i >= 0){ if (S.eq.length === 1){ toast('Garde au moins un équipement'); return; } S.eq.splice(i, 1); } else S.eq.push(id);
     const n = ajusterMenu();
     if (n) toast(n + (n > 1 ? ' plats remplacés' : ' plat remplacé') + ' selon ton matériel');
+    renderAll(); return;
+  }
+  const db = e.target.closest('[data-diet]');
+  if (db){
+    const id = db.dataset.diet, i = S.diet.indexOf(id);
+    if (i >= 0) S.diet.splice(i, 1); else S.diet.push(id);
+    const n = ajusterMenu();
+    const vide = MEAL_ORDER.filter(m => dispoFor(m).length === 0 && S.menus[m].length === 0 && S.counts[m] > 0);
+    if (vide.length) toast('Aucun plat ' + (S.diet.length > 1 ? 'de ces types' : DIET[S.diet[0]].nom.toLowerCase()) + ' pour ' + vide.map(m => MEAL_NOM[m].toLowerCase()).join(' et '));
+    else if (n) toast(n + (n > 1 ? ' plats remplacés' : ' plat remplacé') + ' selon le type de repas choisi');
     renderAll(); return;
   }
   const vw = e.target.closest('[data-view]');
