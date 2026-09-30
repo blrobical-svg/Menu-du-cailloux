@@ -40,9 +40,10 @@
 </script>
 <style>
 :root{
-  --bg:#F2F6F5; --surface:#FFFFFF; --ink:#0B2B33; --muted:#4F6B70; --line:#D5E3E1;
-  --teal:#0E7C86; --teal-ink:#FFFFFF; --pale:#D7EEEC; --coral:#C9432A; --coral-pale:#FBE3DD;
-  --veil-top:rgba(242,246,245,.80); --veil-mid:rgba(242,246,245,.58); --veil-bot:rgba(242,246,245,.30);
+  --bg:#EAF8F5; --surface:#FFFFFF; --ink:#0B2B33; --muted:#4F6B70; --line:#CDEDE6;
+  --teal:#049199; --teal-ink:#FFFFFF; --pale:#D2F3EE; --coral:#FF6A4D; --coral-pale:#FFE4DB;
+  --sun:#FFC64B; --sun-ink:#4A2E00; --lagoon:#00C2B8;
+  --veil-top:rgba(234,248,245,.80); --veil-mid:rgba(234,248,245,.58); --veil-bot:rgba(234,248,245,.30);
   --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --body:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   box-sizing:border-box;
@@ -52,7 +53,8 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0A1E23; --surface:#11303A; --ink:#E6F3F1; --muted:#93B3B3; --line:#1F4550;
-    --teal:#3FB7BF; --teal-ink:#06262B; --pale:#173C45; --coral:#FF8A6B; --coral-pale:#3A1F19;
+    --teal:#2BC4C1; --teal-ink:#06262B; --pale:#173C45; --coral:#FF8A6B; --coral-pale:#3A1F19;
+    --sun:#FFD166; --sun-ink:#3A2400; --lagoon:#3BE0D6;
     --veil-top:rgba(10,30,35,.72); --veil-mid:rgba(10,30,35,.52); --veil-bot:rgba(10,30,35,.28);
   }
   :root:not([data-theme="light"]) .bg-jour{display:none;}
@@ -132,6 +134,16 @@ button{font:inherit;color:inherit;cursor:pointer;}
 .step output,.step input{flex:1;min-width:0;width:100%;text-align:center;font-weight:600;font-size:17px;font-variant-numeric:tabular-nums;border:0;background:transparent;color:var(--ink);font-family:inherit;padding:0;}
 .step input:focus-visible{outline:none;}
 .step:focus-within{border-color:var(--teal);box-shadow:0 0 0 2px var(--pale);}
+.field select{width:100%;height:48px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:inherit;font-weight:600;font-size:17px;text-align:center;text-align-last:center;padding:0 8px;}
+.field select:focus-visible{border-color:var(--teal);box-shadow:0 0 0 2px var(--pale);}
+.field-enfants{grid-column:1/-1;}
+.personnes-repli{grid-column:1/-1;}
+.personnes-grille{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px;}
+.field-titre{display:block;font-size:13px;color:var(--muted);margin:0 0 4px 2px;}
+.tranches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.tranches label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted);text-align:center;}
+.tranche-note{font-size:11px;color:var(--muted);opacity:.8;}
+.tranches select{height:44px;font-size:15px;}
 
 /* jauge du budget */
 .gauge{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 18px 20px;}
@@ -142,7 +154,8 @@ button{font:inherit;color:inherit;cursor:pointer;}
 .gauge.over .msg{color:var(--coral);}
 .per{margin:2px 0 0;font-size:14px;color:var(--muted);min-height:1.4em;}
 .bar{position:relative;height:22px;background:var(--pale);border-radius:11px;margin-top:14px;overflow:hidden;}
-.fill{position:absolute;left:0;top:0;bottom:0;width:0;color:var(--teal);background:currentColor;transition:width .6s cubic-bezier(.3,.7,.2,1);}
+.fill{position:absolute;left:0;top:0;bottom:0;width:0;color:var(--teal);background:linear-gradient(90deg,var(--teal),var(--sun));transition:width .6s cubic-bezier(.3,.7,.2,1);}
+.gauge.over .fill{background:linear-gradient(90deg,var(--coral),#ff9166);}
 .fill::after{content:"";position:absolute;top:0;bottom:0;right:-11px;width:11px;background:radial-gradient(circle at 0 12px,currentColor 10.5px,transparent 11px) 0 0/11px 24px repeat-y;}
 .gauge.over .fill{color:var(--coral);}
 .fill.zero::after{display:none;}
@@ -154,7 +167,7 @@ button{font:inherit;color:inherit;cursor:pointer;}
 
 .head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;font-weight:600;font-size:15px;}
-.btn.primary{background:var(--teal);color:var(--teal-ink);border-color:var(--teal);}
+.btn.primary{background:linear-gradient(135deg,var(--teal),var(--lagoon));color:var(--teal-ink);border-color:var(--teal);}
 .btn:active{transform:translateY(1px);}
 .lnk{border:0;background:transparent;color:var(--teal);font-weight:600;font-size:15px;padding:8px 6px;min-height:36px;}
 .lnk:hover{text-decoration:underline;}
@@ -210,10 +223,13 @@ button{font:inherit;color:inherit;cursor:pointer;}
 .pin span{font-size:12px;color:var(--muted);white-space:nowrap;}
 .info{font-size:14px;color:var(--muted);margin:0 0 12px;}
 .mat-wrap{margin:0 0 14px;}
+.mat-resume{font-size:13px;font-weight:400;color:var(--muted);}
+.mat-repli > summary{cursor:pointer;list-style:none;}
+.mat-repli > summary::-webkit-details-marker{display:none;}
 .mat-lbl{font-size:13px;color:var(--muted);margin:0 0 6px 2px;}
 .mat{display:flex;flex-wrap:wrap;gap:8px;}
 .chipbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 13px;font-size:14px;font-weight:600;}
-.chipbtn[aria-pressed="true"]{background:var(--teal);color:var(--teal-ink);border-color:var(--teal);}
+.chipbtn[aria-pressed="true"]{background:linear-gradient(135deg,var(--teal),var(--lagoon));color:var(--teal-ink);border-color:var(--teal);}
 .how{list-style:none;margin:2px 0 4px;padding:8px 0 4px;border-top:1px dashed var(--line);display:grid;gap:8px;font-size:14px;}
 .how b{font-weight:600;}
 .how-link{display:block;font-size:14px;padding:2px 0 8px;color:var(--teal);font-weight:600;}
@@ -296,22 +312,23 @@ details.about a{color:var(--teal);}
   </header>
 
   <section class="controls" aria-label="Réglages du foyer">
-    <div class="field">
-      <label for="v-adults">Adultes</label>
-      <div class="step">
-        <button type="button" data-act="adults-" aria-label="Un adulte de moins">−</button>
-        <output id="v-adults">2</output>
-        <button type="button" data-act="adults+" aria-label="Un adulte de plus">+</button>
+    <details class="mat-wrap mat-repli personnes-repli" id="personnes-repli">
+      <summary class="mat-lbl">Personnes <span id="personnes-resume" class="mat-resume"></span></summary>
+      <div class="personnes-grille">
+        <div class="field">
+          <label for="v-adults">Adultes</label>
+          <select id="v-adults" data-champ="adults"></select>
+        </div>
+        <div class="field field-enfants">
+          <span class="field-titre">Enfants, par âge</span>
+          <div class="tranches">
+            <label>Bébés<span class="tranche-note">0-2 ans</span><select id="v-bebes" data-champ="bebes"></select></label>
+            <label>Enfants<span class="tranche-note">3-12 ans</span><select id="v-enfants" data-champ="enfants"></select></label>
+            <label>Ados<span class="tranche-note">13-17 ans</span><select id="v-ados" data-champ="ados"></select></label>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="field">
-      <label for="v-kids">Enfants</label>
-      <div class="step">
-        <button type="button" data-act="kids-" aria-label="Un enfant de moins">−</button>
-        <output id="v-kids">2</output>
-        <button type="button" data-act="kids+" aria-label="Un enfant de plus">+</button>
-      </div>
-    </div>
+    </details>
     <div class="field">
       <label for="v-pdj">Petits-déj.</label>
       <div class="step">
@@ -346,15 +363,15 @@ details.about a{color:var(--teal);}
     </div>
   </section>
 
-  <div class="mat-wrap">
-    <div class="mat-lbl">Mon matériel de cuisine</div>
+  <details class="mat-wrap mat-repli" id="mat-repli">
+    <summary class="mat-lbl">Mon matériel de cuisine <span id="mat-resume" class="mat-resume"></span></summary>
     <div class="mat" id="mat" role="group" aria-label="Mon matériel de cuisine"></div>
-  </div>
+  </details>
 
-  <div class="mat-wrap">
-    <div class="mat-lbl">Type de repas</div>
+  <details class="mat-wrap mat-repli" id="diet-repli">
+    <summary class="mat-lbl">Type de repas <span id="diet-resume" class="mat-resume"></span></summary>
     <div class="mat" id="diet" role="group" aria-label="Type de repas"></div>
-  </div>
+  </details>
 
   <section class="gauge" id="gauge" aria-live="polite">
     <div class="lbl">Courses de la semaine</div>
@@ -820,8 +837,9 @@ const KEY = 'menu-caillou-v1';
 const MEAL_ORDER = ['pdj', 'dej', 'din'];
 const MEAL_NOM = {pdj: 'Petit-déjeuner', dej: 'Déjeuner', din: 'Dîner'};
 const MEAL_LABEL = {pdj: 'Petits-déj.', dej: 'Déjeuners', din: 'Dîners'};
-let S = {adults:2, kids:2, budget:15000, menus:{pdj:[], dej:[], din:[]}, counts:{pdj:5, dej:5, din:5}, checked:{}, prices:{}, tab:'menu', open:{}};
-try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
+let S = {adults:2, bebes:0, enfants:2, ados:0, budget:15000, menus:{pdj:[], dej:[], din:[]}, counts:{pdj:5, dej:5, din:5}, checked:{}, prices:{}, tab:'menu', open:{}};
+let __raw = null;
+try { const raw = localStorage.getItem(KEY); if (raw) { __raw = JSON.parse(raw); S = Object.assign(S, __raw); } } catch (e) {}
 // reprise d'une ancienne sauvegarde (un seul menu de dîners)
 if (Array.isArray(S.menu) || S.dinners !== undefined){
   S.menus = S.menus || {pdj: [], dej: [], din: []};
@@ -830,9 +848,14 @@ if (Array.isArray(S.menu) || S.dinners !== undefined){
   if (S.dinners !== undefined) S.counts.din = S.dinners;
   delete S.menu; delete S.dinners;
 }
+if (__raw && __raw.people !== undefined){ if (!__raw.migrated){ S.adults = __raw.people; S.enfants = 0; } delete S.people; }
+if (__raw && __raw.kids !== undefined && __raw.enfants === undefined){ S.enfants = __raw.kids; }
+delete S.kids;
+S.migrated = true;
 (function verifierEtat(){
   const nb = (v, min, max, def) => { const n = parseInt(v, 10); return isNaN(n) ? def : Math.min(max, Math.max(min, n)); };
-  S.adults = nb(S.adults, 1, 10, 2); S.kids = nb(S.kids, 0, 10, 0);
+  S.adults = nb(S.adults, 1, 10, 2);
+  S.bebes = nb(S.bebes, 0, 9, 0); S.enfants = nb(S.enfants, 0, 9, 0); S.ados = nb(S.ados, 0, 9, 0);
   S.budget = nb(S.budget, 1, 5000000, 15000);
   if (['menu', 'shop', 'prices'].indexOf(S.tab) < 0) S.tab = 'menu';
   if (!S.menus || typeof S.menus !== 'object') S.menus = {};
@@ -844,8 +867,6 @@ if (Array.isArray(S.menu) || S.dinners !== undefined){
   ['prices', 'checked', 'open'].forEach(k => { if (!S[k] || typeof S[k] !== 'object' || Array.isArray(S[k])) S[k] = {}; });
   ['auto', 'stores'].forEach(k => { if (S[k] !== undefined && (!S[k] || typeof S[k] !== 'object' || Array.isArray(S[k]))) delete S[k]; });
 })();
-if (S.people !== undefined){ if (!S.migrated){ S.adults = S.people; S.kids = 0; } delete S.people; }
-S.migrated = true;
 if (!S.stores) S.stores = {};
 if (!S.magasins || typeof S.magasins !== 'object') S.magasins = {};
 if (!S.pos || typeof S.pos !== 'object') S.pos = null;
@@ -872,9 +893,9 @@ const storeOf = id => {
   return (ING[id] && ING[id][1] === 'surg') ? 'Thiriet' : '';
 };
 const fmtDate = d => String(d || '').split('-').reverse().join('/');
-const KID = 0.6; // un enfant = 0,6 portion d'adulte
-const heads = () => S.adults + S.kids;
-const portions = () => S.adults + KID * S.kids;
+const AGE = {bebes:0.3, enfants:0.6, ados:1.2}; // portion d'adulte selon la tranche d'âge
+const heads = () => S.adults + S.bebes + S.enfants + S.ados;
+const portions = () => S.adults + AGE.bebes * S.bebes + AGE.enfants * S.enfants + AGE.ados * S.ados;
 function extrasRepas(rid){
   // pour déjeuner et dîner uniquement : complète les groupes manquants (légume, protéine, féculent, laitage, fruit)
   if (!['dej','din'].includes(REC[rid].meal)) return [];
@@ -1035,10 +1056,29 @@ function swapAt(meal, idx){
 }
 
 /* ---------- Affichage ---------- */
+function optionsNombre(select, min, max, valeur){
+  if (!select.dataset.rempli){
+    let html = '';
+    for (let i = min; i <= max; i++) html += `<option value="${i}">${i}</option>`;
+    select.innerHTML = html;
+    select.dataset.rempli = '1';
+  }
+  select.value = valeur;
+}
 function renderControls(){
-  $('#v-adults').textContent = S.adults;
-  $('#v-kids').textContent = S.kids;
+  optionsNombre($('#v-adults'), 1, 10, S.adults);
+  optionsNombre($('#v-bebes'), 0, 9, S.bebes);
+  optionsNombre($('#v-enfants'), 0, 9, S.enfants);
+  optionsNombre($('#v-ados'), 0, 9, S.ados);
   $('#mat').innerHTML = EQ_ORDER.map(e => `<button type="button" class="chipbtn" data-eq="${e}" aria-pressed="${S.eq.includes(e)}">${EQ[e][1]} ${EQ[e][0]}</button>`).join('');
+  $('#mat-resume').textContent = '(' + EQ_ORDER.filter(e => S.eq.includes(e)).map(e => EQ[e][1]).join(' ') + ')';
+  const enfantsResume = [
+    S.bebes ? S.bebes + ' bébé' + (S.bebes > 1 ? 's' : '') : '',
+    S.enfants ? S.enfants + ' enfant' + (S.enfants > 1 ? 's' : '') : '',
+    S.ados ? S.ados + ' ado' + (S.ados > 1 ? 's' : '') : ''
+  ].filter(Boolean).join(', ');
+  $('#personnes-resume').textContent = '(' + S.adults + ' adulte' + (S.adults > 1 ? 's' : '') + (enfantsResume ? ', ' + enfantsResume : '') + ')';
+  $('#diet-resume').textContent = S.diet.length ? '(' + S.diet.map(d => DIET[d].e).join(' ') + ')' : '(aucune restriction)';
   $('#diet').innerHTML = DIET_ORDER.map(d => `<button type="button" class="chipbtn" data-diet="${d}" aria-pressed="${S.diet.includes(d)}">${DIET[d].e} ${DIET[d].nom}</button>`).join('');
   MEAL_ORDER.forEach(m => { const o = $('#v-' + m); if (o) o.textContent = S.counts[m]; });
   const inp = $('#in-budget');
@@ -1189,7 +1229,12 @@ function copyList(){
   const {items} = shopping(allMeals());
   const line = (x, withStore) => '- ' + ING[x.id][0] + ' : ' + qtyText(x.id, x.q, true) + (withStore && storeOf(x.id) ? ' (' + storeOf(x.id) + ')' : '') + '\n';
   const repasTxt = MEAL_ORDER.map(m => S.counts[m] + ' ' + MEAL_LABEL[m].toLowerCase()).join(', ');
-  let t = 'Courses : ' + repasTxt + ', ' + S.adults + (S.adults > 1 ? ' adultes' : ' adulte') + (S.kids ? ' et ' + S.kids + (S.kids > 1 ? ' enfants' : ' enfant') : '') + '\n';
+  const enfantsTxt = [
+    S.bebes ? S.bebes + (S.bebes > 1 ? ' bébés' : ' bébé') : '',
+    S.enfants ? S.enfants + (S.enfants > 1 ? ' enfants' : ' enfant') : '',
+    S.ados ? S.ados + (S.ados > 1 ? ' ados' : ' ado') : ''
+  ].filter(Boolean).join(', ');
+  let t = 'Courses : ' + repasTxt + ', ' + S.adults + (S.adults > 1 ? ' adultes' : ' adulte') + (enfantsTxt ? ' et ' + enfantsTxt : '') + '\n';
   if (S.shopView === 'store' && items.some(x => storeOf(x.id))){
     const by = {};
     items.forEach(x => { const s = storeOf(x.id) || NOSTORE; (by[s] = by[s] || []).push(x); });
@@ -1281,10 +1326,6 @@ document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
   const id = el.dataset.id, meal = el.dataset.meal;
   switch (el.dataset.act){
-    case 'adults-': S.adults = clamp(S.adults - 1, 1, 10); break;
-    case 'adults+': S.adults = clamp(S.adults + 1, 1, 10); break;
-    case 'kids-': S.kids = clamp(S.kids - 1, 0, 10); break;
-    case 'kids+': S.kids = clamp(S.kids + 1, 0, 10); break;
     case 'cnt-': setCount(meal, S.menus[meal].length - 1); break;
     case 'cnt+': setCount(meal, S.menus[meal].length + 1); break;
     case 'budget-': S.budget = clamp(Math.round(S.budget / 1000) * 1000 - 1000, 1000, 500000); break;
@@ -1302,6 +1343,11 @@ document.addEventListener('click', e => {
   renderAll();
 });
 document.addEventListener('change', e => {
+  if (e.target.dataset && e.target.dataset.champ){
+    const champ = e.target.dataset.champ, v = clamp(parseInt(e.target.value, 10) || 0, champ === 'adults' ? 1 : 0, champ === 'adults' ? 10 : 9);
+    S[champ] = v;
+    renderAll(); return;
+  }
   if (e.target.classList && e.target.classList.contains('add-sel') && e.target.value){
     const meal = e.target.dataset.meal, val = e.target.value;
     S.menus[meal].push(val); S.counts[meal] = S.menus[meal].length; renderAll(); return;
