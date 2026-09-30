@@ -844,6 +844,28 @@ function shopping(ids){
 }
 const dec = x => String(Math.round(x * 10) / 10).replace('.', ',');
 const demiDec = x => { const r = Math.round(x * 2) / 2; return (Number.isInteger(r) ? String(r) : String(r).replace('.', ',')); };
+const PIECE = {
+  oignon:{g:120,s:'oignon',p:'oignons'},
+  ail:{g:5,s:"gousse d'ail",p:"gousses d'ail"},
+  carotte:{g:80,s:'carotte',p:'carottes'},
+  pdt:{g:150,s:'pomme de terre',p:'pommes de terre'},
+  tomate:{g:120,s:'tomate',p:'tomates'},
+  courgette:{g:200,s:'courgette',p:'courgettes'},
+  chou:{g:1000,s:'chou',p:'choux'},
+  poivron:{g:150,s:'poivron',p:'poivrons'},
+  concombre:{g:300,s:'concombre',p:'concombres'},
+  citron:{g:80,s:'citron vert',p:'citrons verts'},
+  champi:{g:20,s:'champignon',p:'champignons'},
+  igname:{g:400,s:'igname',p:'ignames'},
+  manioc:{g:300,s:'morceau de manioc',p:'morceaux de manioc'},
+  patate:{g:200,s:'patate douce',p:'patates douces'},
+  banane:{g:150,s:'banane à cuire',p:'bananes à cuire'}
+};
+function equivPiece(id, g){
+  const pc = PIECE[id]; if (!pc) return '';
+  const n = Math.max(1, Math.round(g / pc.g));
+  return ' (≈' + n + ' ' + (n > 1 ? pc.p : pc.s) + ')';
+}
 function equivMesure(ml){
   if (ml < 3) return '';
   if (ml < 13) return ' (' + demiDec(ml / 5) + ' c. à café)';
@@ -852,7 +874,13 @@ function equivMesure(ml){
 }
 function qtyText(id, q, buy){
   const u = ING[id][2];
-  if (u === 'kg') return q < 1 ? Math.max(10, Math.round(q * 100) * 10) + ' g' : dec(q) + ' kg';
+  if (u === 'kg'){
+    if (q < 1){
+      const g = Math.max(10, Math.round(q * 100) * 10);
+      return g + ' g' + (buy ? '' : equivPiece(id, g));
+    }
+    return dec(q) + ' kg' + (buy ? '' : equivPiece(id, q * 1000));
+  }
   if (u === 'L'){
     if (q < 1){
       const ml = Math.max(10, Math.round(q * 100) * 10);
