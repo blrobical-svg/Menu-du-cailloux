@@ -70,7 +70,7 @@ R = {
     'cereales': (['cereales petit dejeuner'], 'pce', r'cereale', r'barre|biscuit|bebe|infantile|chien|chat|liqueur|whisky', 1),
     'thonconserve': (['thon boite'], 'pce', r'thon', r'frais|surgele|steak|pave|tartare|sushi|chat|croquette|filet.*frais', 1),
     'mayonnaise': (['mayonnaise'], 'pce', r'mayonnaise', r'light.*sauce.*salade|allegee.*sauce', 1),
-    'yaourt': (['yaourt nature'], 'pce', r'yaourt', r'glace|boisson lactee(?!.*yaourt)|creme dessert|masque|soin|cheveux', None),
+    'yaourt': (['yaourt nature'], 'pce', r'yaourt', r'glace|boisson lactee(?!.*yaourt)|creme dessert|masque|soin|cheveux', 0.125),
     'bananefruit': (['banane'], 'kg', r'\bbanane', r'cuire|poingo|plantain|chips|seche|confiture|glace|yaourt|smoothie|jus|gateau|bebe|infantile|liqueur', None),
     'mangue': (['mangue'], 'kg', r'\bmangue', r'confiture|jus d|seche|chutney|glace|sirop|the |the$|infusion|smoothie|yaourt', None),
     'ananas': (['ananas'], 'kg', r'\bananas', r'confiture|jus d|conserve|boite|glace|sirop|chips|the |smoothie|yaourt', None),
