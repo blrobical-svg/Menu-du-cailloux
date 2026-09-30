@@ -843,13 +843,26 @@ function shopping(ids){
   return {items, total: items.reduce((a, x) => a + x.cost, 0)};
 }
 const dec = x => String(Math.round(x * 10) / 10).replace('.', ',');
+const demiDec = x => { const r = Math.round(x * 2) / 2; return (Number.isInteger(r) ? String(r) : String(r).replace('.', ',')); };
+function equivMesure(ml){
+  if (ml < 3) return '';
+  if (ml < 13) return ' (' + demiDec(ml / 5) + ' c. à café)';
+  if (ml < 100) return ' (' + demiDec(ml / 15) + ' c. à soupe)';
+  return ' (' + demiDec(ml / 200) + ' verre' + (ml / 200 > 1.05 ? 's' : '') + ')';
+}
 function qtyText(id, q, buy){
   const u = ING[id][2];
   if (u === 'kg') return q < 1 ? Math.max(10, Math.round(q * 100) * 10) + ' g' : dec(q) + ' kg';
-  if (u === 'L')  return q < 1 ? Math.max(10, Math.round(q * 100) * 10) + ' ml' : dec(q) + ' L';
+  if (u === 'L'){
+    if (q < 1){
+      const ml = Math.max(10, Math.round(q * 100) * 10);
+      return ml + ' ml' + (buy ? '' : equivMesure(ml));
+    }
+    return dec(q) + ' L';
+  }
   const lab = ING[id][4] || 'pièce';
-  const n = buy ? Math.ceil(q - 1e-6) : q;
-  const s = Number.isInteger(n) ? String(n) : dec(n);
+  const n = Math.ceil(q - 1e-6);  // toujours arrondi au-dessus : 0,8 pot -> 1 pot, 4,8 œufs -> 5 œufs
+  const s = String(n);
   return s + ' ' + lab + (n > 1 ? 's' : '');
 }
 const unitLabel = id => { const u = ING[id][2]; return u === 'pce' ? (ING[id][4] || 'pièce') : u; };
