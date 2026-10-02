@@ -389,6 +389,7 @@ details.about a{color:var(--teal);}
     <button type="button" role="tab" data-tab="menu" aria-selected="true">Menu</button>
     <button type="button" role="tab" data-tab="shop" aria-selected="false">Courses</button>
     <button type="button" role="tab" data-tab="prices" aria-selected="false">Prix</button>
+    <button type="button" role="tab" data-tab="frigo" aria-selected="false">Frigo</button>
   </nav>
 
   <section id="panel" role="tabpanel"></section>
@@ -542,6 +543,12 @@ const R_ORDER = ['fl','vp','cr','ep','surg'];
 const R_NAME = {fl:'Fruits, légumes et tubercules', vp:'Viandes et poissons', cr:'Crèmerie et œufs', ep:'Épicerie', surg:'Plats surgelés (prix à confirmer)'};
 
 // matériel de cuisine : [nom, icône, mot pour la recherche web]
+const FRIGO_GROUPES = [
+  ['Au frais', ['oeuf','creme','fromage','beurre','lait','yaourt']],
+  ['Au placard', ['riz','pates','lentille','pois','haricot','tomconc','coco','mais','ptpois','concentre','farine','huile','soja','curry','confiture','cafe','cereales','thonconserve','mayonnaise','pain']],
+  ['Légumes et fruits de garde', ['oignon','ail','gingembre','pdt','igname','manioc','patate','carotte','chou','citron','bananefruit']]
+];
+const FRIGO_LISTE = FRIGO_GROUPES.flatMap(([,ids]) => ids);
 const GROUPE = {
   // protéines (viande, poisson, œuf, légumineuses en tant que protéine végétale)
   poulet:'proteine', cuisse:'proteine', hache:'proteine', boeuf:'proteine', saucisse:'proteine', cerf:'proteine',
@@ -872,7 +879,7 @@ S.migrated = true;
   S.adults = nb(S.adults, 1, 10, 2);
   S.bebes = nb(S.bebes, 0, 9, 0); S.enfants = nb(S.enfants, 0, 9, 0); S.ados = nb(S.ados, 0, 9, 0);
   S.budget = nb(S.budget, 1, 5000000, 15000);
-  if (['menu', 'shop', 'prices'].indexOf(S.tab) < 0) S.tab = 'menu';
+  if (['menu', 'shop', 'prices', 'frigo'].indexOf(S.tab) < 0) S.tab = 'menu';
   if (!S.menus || typeof S.menus !== 'object') S.menus = {};
   if (!S.counts || typeof S.counts !== 'object') S.counts = {};
   MEAL_ORDER.forEach(m => {
@@ -888,6 +895,8 @@ if (!S.pos || typeof S.pos !== 'object') S.pos = null;
 if (!(S.conso > 0)) S.conso = 8;
 if (!Array.isArray(S.diet)) S.diet = [];
 S.diet = S.diet.filter(d => DIET[d]);
+if (!Array.isArray(S.frigo)) S.frigo = [];
+S.frigo = S.frigo.filter(id => FRIGO_LISTE.includes(id));
 if (!(S.prixL > 0)) S.prixL = 155;
 if (!Array.isArray(S.eq)) S.eq = ['plaques'];
 S.eq = S.eq.filter(e => EQ[e]);
@@ -932,13 +941,22 @@ const recipeLines = rid => {
   }
   return [...fusion.values()].map(x => ({id: x.id, q: x.q * portions() / 4, extra: x.extra}));
 };
-const recipeCost = rid => recipeLines(rid).reduce((a, x) => a + x.q * price(x.id), 0);
+const prixEffectif = id => S.frigo.includes(id) ? 0 : price(id);
+const recipeCost = rid => recipeLines(rid).reduce((a, x) => a + x.q * prixEffectif(x.id), 0);
+const scoreFrigo = rid => REC[rid].l.filter(([ing]) => S.frigo.includes(ing)).length;
+function meilleursFrigo(candidats){
+  if (!S.frigo.length) return candidats;
+  const scores = candidats.map(id => scoreFrigo(id));
+  const max = Math.max(...scores, 0);
+  if (max <= 0) return candidats;
+  return candidats.filter((id, i) => scores[i] === max);
+}
 function shopping(ids){
   const m = {};
   ids.forEach(rid => recipeLines(rid).forEach(x => { m[x.id] = (m[x.id] || 0) + x.q; }));
   const items = Object.entries(m).map(([id, q]) => {
     const bq = ING[id][2] === 'pce' ? Math.ceil(q - 1e-6) : q;
-    return {id, q: bq, cost: bq * price(id)};
+    return {id, q: bq, cost: bq * prixEffectif(id)};
   });
   return {items, total: items.reduce((a, x) => a + x.cost, 0)};
 }
@@ -1022,7 +1040,7 @@ function generateMeal(meal, ceiling){
     for (let i = 0; i < 600; i++){
       const ids = shuffle(all).slice(0, n), t = shopping(ids).total;
       if (t <= budgetDispo){
-        const score = new Set(ids.map(id => REC[id].prot)).size + Math.random() * .9 + (t / (budgetDispo || 1)) * .3;
+        const score = new Set(ids.map(id => REC[id].prot)).size + Math.random() * .9 + (t / (budgetDispo || 1)) * .3 + ids.reduce((a, id) => a + scoreFrigo(id), 0) * .6;
         if (score > bestScore){ bestScore = score; best = ids; }
       }
     }
@@ -1041,7 +1059,7 @@ function pickToAdd(meal){
   if (!rest.length) rest = tous;  // plus de plat inédit : on autorise à repiocher un plat déjà choisi
   if (!rest.length) return null;
   const ok = rest.filter(id => shopping(S.menus[meal].concat(id)).total <= budgetDispo);
-  if (ok.length) return ok[Math.floor(Math.random() * ok.length)];
+  if (ok.length){ const top = meilleursFrigo(ok); return top[Math.floor(Math.random() * top.length)]; }
   return rest.map(id => [id, recipeCost(id)]).sort((a, b) => a[1] - b[1])[0][0];
 }
 function setCount(meal, n){
@@ -1071,7 +1089,7 @@ function swapAt(meal, idx){
   if (!rest.length) return;
   const trial = r => { const m = S.menus[meal].slice(); m[idx] = r; return shopping(m).total; };
   const ok = rest.filter(r => trial(r) <= budgetDispo);
-  const pick = ok.length ? ok[Math.floor(Math.random() * ok.length)] : rest.sort((a, b) => trial(a) - trial(b))[0];
+  const pick = ok.length ? (t => t[Math.floor(Math.random() * t.length)])(meilleursFrigo(ok)) : rest.sort((a, b) => trial(a) - trial(b))[0];
   S.menus[meal][idx] = pick;
   S.open = {};
 }
@@ -1129,7 +1147,7 @@ function recipeItem(id, meal, idx){
     const q = encodeURIComponent(r.n + ' recette ' + (pref ? EQ[pref][2] : ''));
     const lignes = recipeLines(id);
     const premierExtra = lignes.findIndex(x => x.extra);
-    const ligneHtml = x => `<li><span>${ING[x.id][0]}</span><span>${qtyText(x.id, x.q, false)}</span><span>${fmt(x.q * price(x.id))}</span></li>`;
+    const ligneHtml = x => `<li><span>${ING[x.id][0]}${S.frigo.includes(x.id) ? ' <i class="frigo-tag">au frigo</i>' : ''}</span><span>${qtyText(x.id, x.q, false)}</span><span>${fmt(x.q * prixEffectif(x.id))}</span></li>`;
     const listeIngr = lignes.map((x, i) => (i === premierExtra ? '<li class="lines-note">Pour un repas complet</li>' : '') + ligneHtml(x)).join('');
     detail = `<ul class="lines">${listeIngr}</ul>` +
       `<ul class="how">${steps.join('')}</ul>` +
@@ -1174,7 +1192,7 @@ function localiser(){
 }
 function shopItem(x, showStore){
   const done = !!S.checked[x.id], st = showStore ? storeOf(x.id) : '';
-  return `<li class="item ${done ? 'done' : ''}"><input type="checkbox" id="ck-${x.id}" data-ck="${x.id}" ${done ? 'checked' : ''}><label class="nm" for="ck-${x.id}">${ING[x.id][0]}${st ? `<small class="st">${esc(st)}</small>` : ''}</label><span class="q">${qtyText(x.id, x.q, true)}</span><span class="c">${fmt(x.cost)}</span></li>`;
+  return `<li class="item ${done ? 'done' : ''}"><input type="checkbox" id="ck-${x.id}" data-ck="${x.id}" ${done ? 'checked' : ''}><label class="nm" for="ck-${x.id}">${ING[x.id][0]}${S.frigo.includes(x.id) ? ' <i class="frigo-tag">au frigo</i>' : ''}${st ? `<small class="st">${esc(st)}</small>` : ''}</label><span class="q">${qtyText(x.id, x.q, true)}</span><span class="c">${fmt(x.cost)}</span></li>`;
 }
 function renderShop(){
   const {items, total} = shopping(allMeals());
@@ -1237,9 +1255,19 @@ function renderPrices(){
   });
   $('#panel').innerHTML = html;
 }
+function renderFrigo(){
+  let html = `<div class="head"><h2>Mon frigo</h2>${S.frigo.length ? `<button type="button" class="btn" data-act="vider-frigo">Tout décocher</button>` : ''}</div>
+    <p class="info">Coche ce que tu as déjà : l'appli en tient compte dans le prix des plats et te propose en priorité des recettes qui s'en servent.</p>`;
+  FRIGO_GROUPES.forEach(([nom, ids]) => {
+    html += `<div class="group"><h3>${nom}</h3><div class="mat" role="group" aria-label="${nom}">` +
+      ids.map(id => `<button type="button" class="chipbtn" data-frigo="${id}" aria-pressed="${S.frigo.includes(id)}">${ING[id][0]}</button>`).join('') +
+      `</div></div>`;
+  });
+  $('#panel').innerHTML = html;
+}
 function renderPanel(){
   document.querySelectorAll('.tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === S.tab));
-  if (S.tab === 'menu') renderMenu(); else if (S.tab === 'shop') renderShop(); else renderPrices();
+  if (S.tab === 'menu') renderMenu(); else if (S.tab === 'shop') renderShop(); else if (S.tab === 'prices') renderPrices(); else renderFrigo();
 }
 function renderAll(){ renderControls(); renderGauge(); renderPanel(); save(); }
 
@@ -1328,6 +1356,12 @@ document.addEventListener('click', e => {
     if (n) toast(n + (n > 1 ? ' plats remplacés' : ' plat remplacé') + ' selon ton matériel');
     renderAll(); return;
   }
+  const fb = e.target.closest('[data-frigo]');
+  if (fb){
+    const id = fb.dataset.frigo, i = S.frigo.indexOf(id);
+    if (i >= 0) S.frigo.splice(i, 1); else S.frigo.push(id);
+    renderAll(); return;
+  }
   const db = e.target.closest('[data-diet]');
   if (db){
     const id = db.dataset.diet, i = S.diet.indexOf(id);
@@ -1358,6 +1392,7 @@ document.addEventListener('click', e => {
     case 'uncheck': S.checked = {}; break;
     case 'copy': copyList(); return;
     case 'reset-prices': S.prices = {}; break;
+    case 'vider-frigo': S.frigo = []; break;
     case 'localiser': localiser(); return;
     case 'share': partager(); return;
   }
