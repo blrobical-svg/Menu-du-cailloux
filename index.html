@@ -832,6 +832,19 @@ const REC = {
     {plaques:"Bœuf saisi 3 à 4 min par face, refroidi puis tranché finement sur la salade."}, 'dej'),
   dejsandwichoeuf: rc('Sandwich œuf mayonnaise','🥚',10,'Rapide','oeuf','pain 2, oeuf 6, mayonnaise .15, salade .3',
     {plaques:"Œufs durs 9 min à l'eau, écrasés à la fourchette avec la mayonnaise, puis garnis dans le pain."}, 'dej'),
+  dejrizsauteoeuf: rc('Riz sauté aux légumes et œuf','🍳',20,'Tout-en-un','oeuf','riz .32, oeuf 4, carotte .2, oignon .15, poivron .2',
+    {plaques:"Riz cuit, légumes et oignon émincés sautés 5 min, œufs battus ajoutés en remuant 2 min, riz incorporé et réchauffé 3 min.",
+     riz:"Riz cuit au cuiseur, puis légumes et œufs sautés à la poêle comme ci-dessus."}, 'dej'),
+  dejsoupelegumes: rc('Soupe de légumes et pain','🥕',25,'Léger','veg','carotte .3, pdt .3, oignon .15, pain 1, fromage .08',
+    {plaques:"Légumes coupés, cuits 20 min à l'eau frémissante, mixés. Servie avec le pain et le fromage râpé.",
+     thermo:"Légumes et eau, 20 min, 100°C, vitesse 1, puis mixés 1 min vitesse progressive."}, 'dej'),
+  dejquichejambon: rc('Quiche jambon-fromage et salade','🥧',40,'Familial','oeuf','farine .2, beurre .1, oeuf 4, lait .2, jambon .2, fromage .12, salade 1',
+    {four:"Pâte (farine, beurre, un peu d'eau) foncée dans un moule. Appareil à base d'œufs et de lait versé dessus avec jambon et fromage. 35 min à 180 °C. Salade à côté."}, 'dej'),
+  dejpatesthonchaud: rc('Pâtes au thon chaudes','🍝',20,'Rapide','poisson','pates .3, thonconserve 1.5, tomate .4, fromage .1, oignon .1',
+    {plaques:"Pâtes cuites à l'eau. Sauce tomate, oignon et thon mijotés 10 min, mélangés aux pâtes et au fromage.",
+     riz:"Pâtes cuites au cuiseur à riz avec un peu d'eau, sauce préparée à la poêle comme ci-dessus."}, 'dej'),
+  dejgratinlegumes: rc('Gratin de légumes et jambon','🧀',35,'Familial','porc','pdt .5, courgette .3, jambon .2, fromage .12, lait .15',
+    {four:"Pommes de terre et courgette en fines rondelles, jambon, lait et fromage râpé : 30 min à 190 °C."}, 'dej'),
 };
 
 /* ---------- État ---------- */
@@ -959,6 +972,7 @@ function equivMesure(ml){
   if (ml < 100) return ' (' + demiDec(ml / 15) + ' c. à soupe)';
   return ' (' + demiDec(ml / 200) + ' verre' + (ml / 200 > 1.05 ? 's' : '') + ')';
 }
+const DEMI_POSSIBLE = new Set(['pain']);
 function qtyText(id, q, buy){
   const u = ING[id][2];
   if (u === 'kg'){
@@ -976,6 +990,11 @@ function qtyText(id, q, buy){
     return dec(q) + ' L';
   }
   const lab = ING[id][4] || 'pièce';
+  if (DEMI_POSSIBLE.has(id)){
+    // ingrédient qu'on peut raisonnablement acheter ou servir par demi-unité (ex. une demi-baguette)
+    const n = Math.max(0.5, Math.ceil((q - 1e-6) * 2) / 2);
+    return demiDec(n) + ' ' + lab + (n > 1 ? 's' : '');
+  }
   const n = Math.ceil(q - 1e-6);  // toujours arrondi au-dessus : 0,8 pot -> 1 pot, 4,8 œufs -> 5 œufs
   const s = String(n);
   return s + ' ' + lab + (n > 1 ? 's' : '');
