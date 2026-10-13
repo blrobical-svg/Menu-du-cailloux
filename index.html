@@ -885,7 +885,7 @@ S.migrated = true;
   if (!S.counts || typeof S.counts !== 'object') S.counts = {};
   MEAL_ORDER.forEach(m => {
     if (!Array.isArray(S.menus[m])) S.menus[m] = [];
-    S.counts[m] = nb(S.counts[m], 1, 7, 5);
+    S.counts[m] = nb(S.counts[m], 0, 7, 5);
   });
   ['prices', 'checked', 'open'].forEach(k => { if (!S[k] || typeof S[k] !== 'object' || Array.isArray(S[k])) S[k] = {}; });
   ['auto', 'stores'].forEach(k => { if (S[k] !== undefined && (!S[k] || typeof S[k] !== 'object' || Array.isArray(S[k]))) delete S[k]; });
@@ -1032,25 +1032,24 @@ const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { c
 function generateMeal(meal, ceiling){
   const budgetDispo = ceiling !== undefined ? Math.max(0, ceiling) : Math.max(0, S.budget - autresRepasTotal(meal));
   const all = dispoFor(meal);
-  if (!all.length){ S.menus[meal] = []; S.counts[meal] = 0; S.open = {}; return; }
-  const nMax = Math.min(S.counts[meal], all.length);
-  // Essaie d'abord le nombre de plats demandé ; si le budget ne suit pas, réduit la variété
-  // (moins de plats différents, donc plus de répétition dans la semaine) plutôt que dépasser.
-  for (let n = nMax; n >= 1; n--){
-    let best = null, bestScore = -1;
-    for (let i = 0; i < 600; i++){
-      const ids = shuffle(all).slice(0, n), t = shopping(ids).total;
-      if (t <= budgetDispo){
-        const score = new Set(ids.map(id => REC[id].prot)).size + Math.random() * .9 + (t / (budgetDispo || 1)) * .3 + ids.reduce((a, id) => a + scoreFrigo(id), 0) * .6;
-        if (score > bestScore){ bestScore = score; best = ids; }
-      }
+  if (!all.length || S.counts[meal] === 0){ S.menus[meal] = []; S.counts[meal] = all.length ? S.counts[meal] : 0; S.open = {}; return; }
+  const n = Math.min(S.counts[meal], all.length);
+  // Garde le nombre de plats choisi par la personne : on cherche la meilleure combinaison
+  // sous le budget, et si aucune n'y tient, on prend la moins chère au-dessus plutôt que
+  // de réduire le nombre de plats différents.
+  let best = null, bestScore = -1;
+  let proche = null, procheTotal = Infinity;
+  for (let i = 0; i < 600; i++){
+    const ids = shuffle(all).slice(0, n), t = shopping(ids).total;
+    if (t <= budgetDispo){
+      const score = new Set(ids.map(id => REC[id].prot)).size + Math.random() * .9 + (t / (budgetDispo || 1)) * .3 + ids.reduce((a, id) => a + scoreFrigo(id), 0) * .6;
+      if (score > bestScore){ bestScore = score; best = ids; }
+    } else if (t < procheTotal){
+      procheTotal = t; proche = ids;
     }
-    if (best){ S.menus[meal] = best; S.counts[meal] = n; S.open = {}; return; }
   }
-  // Même un seul plat dépasse le budget disponible : on garde le moins cher de tous, seul.
-  const moinsCher = all.map(id => [id, recipeCost(id)]).sort((a, b) => a[1] - b[1])[0][0];
-  S.menus[meal] = [moinsCher];
-  S.counts[meal] = 1;
+  S.menus[meal] = best || proche || shuffle(all).slice(0, n);
+  S.counts[meal] = n;
   S.open = {};
 }
 function pickToAdd(meal){
@@ -1064,7 +1063,7 @@ function pickToAdd(meal){
   return rest.map(id => [id, recipeCost(id)]).sort((a, b) => a[1] - b[1])[0][0];
 }
 function setCount(meal, n){
-  n = Math.max(1, Math.min(7, n));
+  n = Math.max(0, Math.min(7, n));
   while (S.menus[meal].length > n) S.menus[meal].pop();
   for (let g = 0; S.menus[meal].length < n && g < 30; g++){ const id = pickToAdd(meal); if (!id) break; S.menus[meal].push(id); }
   S.counts[meal] = S.menus[meal].length;
@@ -1169,7 +1168,7 @@ function renderMenu(){
     const menu = S.menus[meal], rest = dispoFor(meal);
     return `<section class="meal-block">
       <div class="head"><h2>${MEAL_NOM[meal]}</h2><button type="button" class="btn primary" data-act="new" data-meal="${meal}">Nouveau menu</button></div>` +
-      (menu.length ? `<ul class="recipes">${menu.map((id, idx) => recipeItem(id, meal, idx)).join('')}</ul>` : `<p class="empty">Aucun plat pour l'instant. Ajoute-en un ou compose un nouveau menu.</p>`) +
+      (menu.length ? `<ul class="recipes">${menu.map((id, idx) => recipeItem(id, meal, idx)).join('')}</ul>` : `<p class="empty">${S.counts[meal] === 0 ? 'Pas de ' + MEAL_NOM[meal].toLowerCase() + ' prévu : touche + pour en ajouter un.' : "Aucun plat pour l'instant. Ajoute-en un ou compose un nouveau menu."}</p>`) +
       (rest.length ? `<label class="add"><span class="sr">Ajouter un plat (${MEAL_NOM[meal]})</span><select data-meal="${meal}" class="add-sel"><option value="">Ajouter un plat…</option>${rest.map(id => `<option value="${id}">${REC[id].n}${menu.includes(id) ? ' — déjà au menu' : ''} (${fmt(recipeCost(id))})</option>`).join('')}</select></label>` : '') +
       `</section>`;
   }).join('');

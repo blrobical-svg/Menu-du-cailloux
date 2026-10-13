@@ -1,7 +1,7 @@
 MENU CAILLOU - MISE À JOUR 100 % AUTOMATIQUE DES PRIX
 
 Une seule installation (environ 10 minutes). Ensuite, plus rien à faire :
-- chaque lundi matin (heure de Nouméa), un robot gratuit de GitHub relève les prix sur prix.nc ;
+- chaque nuit (vers 3 h, heure de Nouméa), un robot gratuit de GitHub relève les prix sur prix.nc ;
 - à chaque ouverture, l'appli lit ces prix toute seule.
 
 Ce qu'il te faut : un compte GitHub gratuit. Tout se fait dans le navigateur, téléphone compris.
