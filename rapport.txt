@@ -6,7 +6,7 @@ tomate : 460 F chez Korail Ducos  (produit : tomate ronde au kilo loc ; les 3 mo
 courgette : 240 F chez Carrefour Express Ouemo  (produit : courgette verte ronde au kilo loc ; les 3 moins chers : courgette verte au kilo loc 150 | courgette verte ronde au kilo loc 240 | courgette jaune au kilo loc  330)
 chou : 130 F chez Magenta Discount  (produit : chou vert au kilo loc ; les 3 moins chers : chou de chine blanc au kilo loc 130 | chou vert au kilo loc 130 | chou de chine vert au kilo loc 165)
 poivron : 780 F chez Korail Ducos  (produit : poivron vert au kilo imp ; les 3 moins chers : poivron vert au kilo loc 595 | poivron vert au kilo imp 780 | poivron rouge au kilo imp 795)
-concombre : 270 F chez Discount Trianon  (produit : concombre vert au kilo loc ; les 3 moins chers : concombre télégraphe au kilo loc 190 | concombre vert au kilo loc 190 | concombre télégraphe au kilo imp  220)
+concombre : 265 F chez Carrefour Express Ouemo  (produit : concombre vert au kilo loc ; les 3 moins chers : concombre télégraphe au kilo loc 190 | concombre vert au kilo loc 190 | concombre télégraphe au kilo imp  220)
 salade : 240 F chez Bricorama  (produit : graines Tropica laitue batavia ; les 3 moins chers : graines Tropica laitue batavia 190)
 avocat : 202 F chez Korail Ducos  (produit : avocat au kilo loc  ; les 3 moins chers : avocat au kilo imp 138 | avocat au kilo loc  202 | avocat surgelé Salud en dé sachet 500 g 348)
 citron : 545 F chez Auchan Quai Ferry  (produit : citron 4 saisons au kilo loc ; les 3 moins chers : citron lime au kilo loc 450 | citron 4 saisons au kilo loc 545 | citron madagascar au kilo loc 550)
@@ -60,4 +60,4 @@ huile : 220 F chez Casino Les Halles Magenta  (produit : huile de tournesol Kern
 soja : 471 F chez Discount Trianon  (produit : sauce soja The Holy Sauce bouteille 700 ml ; les 3 moins chers : sauce soja/soyo Kikkoman bouteille 1,8 l 294 | sauce soja The Holy Sauce bouteille 700 ml 471 | sauce soja/soyo Tung Chun black soy bleu bouteille verre 50 cl 490)
 curry : aucun produit trouvé (le prix de départ reste utilisé)
 
-Codes de commune vus dans les relevés : {'1': 64, '2b4a4fd1-8d98-4b03-af62-d26511791a23': 12, 'e86ad3fe-534c-4a3b-8645-e89bdca6b682': 11, '2': 11, '27c6d50b-21c8-4b77-846f-43d523a08847': 11, '0ccbd619-fd41-4f34-a4de-d4bdc1c0412b': 10, '4': 4, '65d8b71f-795d-4c28-8e98-41763e8c137c': 2}
+Codes de commune vus dans les relevés : {'1': 64, '0ccbd619-fd41-4f34-a4de-d4bdc1c0412b': 12, '2': 12, '2b4a4fd1-8d98-4b03-af62-d26511791a23': 12, 'e86ad3fe-534c-4a3b-8645-e89bdca6b682': 11, '27c6d50b-21c8-4b77-846f-43d523a08847': 11, '4': 4, '65d8b71f-795d-4c28-8e98-41763e8c137c': 2}
