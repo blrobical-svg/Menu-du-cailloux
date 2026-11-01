@@ -60,4 +60,4 @@ huile : 220 F chez Casino Les Halles Magenta  (produit : huile de tournesol Kern
 soja : 500 F chez Leader Price Magenta  (produit : sauce soja/soyo Kikkoman bouteille 500 ml ; les 3 moins chers : sauce soja/soyo Kikkoman bouteille 1,8 l 305 | sauce soja/soyo Kikkoman bouteille 500 ml 390 | sauce soja The Holy Sauce bouteille 700 ml 471)
 curry : aucun produit trouvé (le prix de départ reste utilisé)
 
-Codes de commune vus dans les relevés : {'1': 73, '2': 28, '0ccbd619-fd41-4f34-a4de-d4bdc1c0412b': 20, '2b4a4fd1-8d98-4b03-af62-d26511791a23': 17, 'e86ad3fe-534c-4a3b-8645-e89bdca6b682': 14, '27c6d50b-21c8-4b77-846f-43d523a08847': 11, '4': 6, '4ce9a330-12fe-4765-b68b-0a7d0d7464ff': 4}
+Codes de commune vus dans les relevés : {'1': 73, '2': 28, '0ccbd619-fd41-4f34-a4de-d4bdc1c0412b': 20, '2b4a4fd1-8d98-4b03-af62-d26511791a23': 15, 'e86ad3fe-534c-4a3b-8645-e89bdca6b682': 14, '27c6d50b-21c8-4b77-846f-43d523a08847': 11, '4': 6, '4ce9a330-12fe-4765-b68b-0a7d0d7464ff': 4}
