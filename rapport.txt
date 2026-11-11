@@ -1,5 +1,5 @@
 oignon : 195 F chez Myshop Supermarche  (produit : oignon sec brun au kilo imp ; les 3 moins chers : oignon brun (sec) loc 195 | oignon sec brun au kilo imp 195 | oignon rouge au kilo imp 255)
-ail : 415 F chez Carrefour Express Ouemo  (produit : ail au kilo imp ; les 3 moins chers : ail frais filet 500 g 400 | ail au kilo imp 415 | ail haché Woolworths minced garlic bocal 250 g 740)
+ail : 415 F chez Carrefour Express Ouemo  (produit : ail au kilo imp ; les 3 moins chers : ail frais filet 500 g 400 | ail au kilo imp 415 | ail blanc au kilo imp 590)
 carotte : 290 F chez Korail Ducos  (produit : carotte au kilo loc ; les 3 moins chers : carotte au kilo imp 215 | carotte au kilo loc 290 | croquette pour chien adulte Casino boeuf/céréales/carotte sac 1.5 kg 663)
 pdt : 331 F chez Casino Les Halles Magenta  (produit : pomme de terre du champ filet jaune 3 kg loc ; les 3 moins chers : pomme de terre jardinière filet jaune 3 kg import 306 | pomme de terre du champ filet jaune 3 kg loc 331 | pomme de terre du champ filet vert 3 kg import 331)
 tomate : 495 F chez Auchan Quai Ferry  (produit : tomate poche 1 kg loc ; les 3 moins chers : tomate ronde au kilo loc 355 | tomate poche 1 kg loc 495 | tomate ronde au kilo imp 560)
@@ -7,7 +7,7 @@ courgette : 160 F chez Discount Trianon  (produit : courgette verte au kilo loc 
 chou : 130 F chez Magenta Discount  (produit : chou vert au kilo loc ; les 3 moins chers : chou de chine blanc au kilo loc 125 | chou vert au kilo loc 130 | chou de chine vert au kilo loc 150)
 poivron : 600 F chez Auchan Quai Ferry  (produit : poivron jaune au kilo loc ; les 3 moins chers : poivron vert au kilo loc 520 | poivron jaune au kilo loc 600 | poivron rouge au kilo loc 600)
 concombre : 145 F chez Korail Normandie  (produit : concombre télégraphe au kilo loc ; les 3 moins chers : concombre vert au kilo loc 110 | concombre télégraphe au kilo loc 145 | concombre vert au kilo imp 365)
-salade : 190 F chez enseigne inconnue  (produit : graines Tropica laitue batavia ; les 3 moins chers : graines Tropica laitue batavia 190)
+salade : 220 F chez Carrefour Market Magenta  (produit : graines Tropica laitue batavia ; les 3 moins chers : graines Tropica laitue batavia 190)
 avocat : 205 F chez Auchan Quai Ferry  (produit : avocat au kilo loc  ; les 3 moins chers : avocat au kilo imp 124 | avocat au kilo loc  205 | avocat surgelé Salud en dé sachet 500 g 348)
 citron : 545 F chez Auchan Quai Ferry  (produit : citron 4 saisons au kilo loc ; les 3 moins chers : citron lime au kilo loc 465 | citron 4 saisons au kilo loc 545 | citron 4 saisons au kilo imp 640)
 gingembre : 920 F chez Auchan Quai Ferry  (produit : gingembre au kilo loc ; les 3 moins chers : gingembre au kilo imp 500 | gingembre au kilo loc 920 | gingembre concassé Woolworths crushed ginger bocal 230 g 978)
@@ -47,7 +47,7 @@ creme : 50 F chez Discount Trianon  (produit : soupe Belle France velouté de po
 fromage : 1295 F chez Leader Price Magenta  (produit : emmental râpé Reybier sachet 1 kg ; les 3 moins chers : emmental râpé Paysan Breton sachet 1 kg 1295 | emmental râpé Reybier sachet 1 kg 1295 | emmental râpé Simpl sachet 1 kg 1325)
 riz : 116 F chez Michel-Ange Supermarket  (produit : riz jasmin Mekong parfumé saveur et senteur du Vietnam 5 kg ; les 3 moins chers : riz jasmin Excel Dragon paquet 1 kg 102 | riz jasmin Mekong parfumé saveur et senteur du Vietnam 5 kg 116 | riz jasmin Mekong parfumé 1 kg 124)
 pates : 290 F chez Myshop Supermarche  (produit : pâte macaroni Top Budget sachet 1 kg ; les 3 moins chers : pâte macaroni Leader Price sachet 1 kg 264 | pâte macaroni Top Budget sachet 1 kg 290 | pâte spaghetti Produits Blancs sachet 1 kg 310)
-lentille : 922 F chez Carrefour Market N'Gea  (produit : lentille corail Carrefour Bio paquet 450 g ; les 3 moins chers : lentille blonde Belle France paquet 500 g 450 | lentille corail Carrefour Bio paquet 450 g 922 | lentille corail Saint Eloi bio paquet 500 g 990)
+lentille : 670 F chez Carrefour Market Ducos  (produit : lentille verte Carrefour Extra origine France paquet 500 g ; les 3 moins chers : lentille blonde Belle France paquet 500 g 450 | lentille verte Carrefour Extra origine France paquet 500 g 670 | lentille verte Carrefour Classic' paquet 500 g 740)
 pois : aucun produit trouvé (le prix de départ reste utilisé)
 haricot : aucun produit trouvé (le prix de départ reste utilisé)
 tomconc : aucun produit trouvé (le prix de départ reste utilisé)
@@ -60,4 +60,4 @@ huile : 220 F chez Casino Les Halles Magenta  (produit : huile de tournesol Kern
 soja : 500 F chez Leader Price Magenta  (produit : sauce soja/soyo Kikkoman bouteille 500 ml ; les 3 moins chers : sauce soja/soyo Kikkoman bouteille 1,8 l 497 | sauce soja/soyo Kikkoman bouteille 500 ml 500 | sauce soja The Holy Sauce bouteille 700 ml 500)
 curry : aucun produit trouvé (le prix de départ reste utilisé)
 
-Codes de commune vus dans les relevés : {'1': 57, '2': 17, '27c6d50b-21c8-4b77-846f-43d523a08847': 16, '2b4a4fd1-8d98-4b03-af62-d26511791a23': 14, 'e86ad3fe-534c-4a3b-8645-e89bdca6b682': 9, '0ccbd619-fd41-4f34-a4de-d4bdc1c0412b': 7, '4': 5, '3': 2}
+Codes de commune vus dans les relevés : {'1': 58, '2': 16, '27c6d50b-21c8-4b77-846f-43d523a08847': 16, '2b4a4fd1-8d98-4b03-af62-d26511791a23': 14, 'e86ad3fe-534c-4a3b-8645-e89bdca6b682': 9, '0ccbd619-fd41-4f34-a4de-d4bdc1c0412b': 8, '4': 4, '4ce9a330-12fe-4765-b68b-0a7d0d7464ff': 3}
